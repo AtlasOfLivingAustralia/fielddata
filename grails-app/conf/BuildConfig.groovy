@@ -35,8 +35,8 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.16'
-        //build 'ala-cas-client:au.org.ala:1.0-SNAPSHOT'
-        //build 'cas-client-core:org.jasig.cas:3.1.10'
+        build 'au.org.ala:ala-cas-client:1.0-SNAPSHOT'
+        build 'org.jasig.cas:cas-client-core:3.1.10'
         build 'au.org.ala:ala-cas-client:1.0-SNAPSHOT'
         build 'org.jasig.cas:cas-client-core:3.1.10'
         build 'javax.media:jai-core:1.1.3'
