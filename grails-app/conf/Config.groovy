@@ -10,7 +10,6 @@
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
-fielddata.mediaDir = "/data/fielddata/"
 headerAndFooter.baseURL = "http://www2.ala.org.au/commonui"
 security.cas.urlPattern = ""
 security.cas.loginUrl = "https://auth.ala.org.au/cas/login"
@@ -71,11 +70,16 @@ grails.hibernate.cache.queries = true
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://localhost:8080"
+        grails.serverURL = "http://moyesyside.ala.org.au:8080"
+        fielddata.mediaUrl = "http://moyesyside.ala.org.au/~davemartin/fielddata/media/"
+        fielddata.mediaDir = "/Users/davemartin/Sites/fielddata/media/"
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://localhost:8080"
+        grails.serverURL = "http://audax.ala.org.au:8080"
+        grails.serverURL = "http://audax.ala.org.au:8080"
+        fielddata.mediaUrl = "http://audax.ala.org.au/~mar759/fielddata/media/"
+        fielddata.mediaDir = "/Users/mar759/Sites/fielddata/media/"
     }
 }
 

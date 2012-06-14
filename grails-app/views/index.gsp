@@ -98,6 +98,20 @@
                 </li>
             </ul>
 
+            <h3>Images</h3>
+            <ul class="webserviceList">
+                <li>
+                    <strong>List records with images</strong>
+                    - HTTP GET on the URL /images/
+                    <ul class="paramsList">
+                        <li>sort  - the property to sort results by. Default is dateCreated</li>
+                        <li>order - "asc" or "desc"</li>
+                        <li>start - offset to use for paging. default is 0</li>
+                        <li>pageSize - Page size to use. default is 30</li>
+                    </ul>
+                </li>
+             </ul>
+
             <h3>Bookmarked locations</h3>
             <ul class="webserviceList">
                 <li>
@@ -124,11 +138,11 @@
                 </li>
                 <li>
                     <strong>Delete</strong>
-                    - GET
+                    - HTTP DELETE on /location/&lt;ID&gt;
                 </li>
                 <li>
                     <strong>Delete All</strong>
-                    - GET
+                    - HTTP DELETE /location/user
                 </li>
             </ul>
         </div>

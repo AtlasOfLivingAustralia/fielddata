@@ -2,6 +2,7 @@ package au.org.ala.fielddata
 
 import groovy.json.JsonSlurper
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 
 
 class RecordController {
@@ -19,7 +20,7 @@ class RecordController {
         def id = mapOfProperties["_id"].toString()
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
-
+        setupMediaUrls(mapOfProperties)
         mapOfProperties
     }
 
@@ -43,19 +44,26 @@ class RecordController {
             def id = mapOfProperties["_id"].toString()
             mapOfProperties["id"] = id
             mapOfProperties.remove("_id")
-            if (mapOfProperties["associatedMedia"] != null){
-               def imagePath = mapOfProperties["associatedMedia"]
-               def image = [
-                thumb : mapOfProperties["associatedMedia"] + "thumb",
-                small : mapOfProperties["associatedMedia"] + "small",
-                large : mapOfProperties["associatedMedia"] + "large",
-                raw : mapOfProperties["associatedMedia"],
-              ]
-              mapOfProperties['images'] = [image, image]
-            }
+            setupMediaUrls(mapOfProperties)
             records.add(mapOfProperties)
         }
         render(contentType: "text/json") { records }
+    }
+
+    def setupMediaUrls(mapOfProperties){
+        if (mapOfProperties["associatedMedia"] != null){
+            def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
+                    grailsApplication.config.fielddata.mediaUrl)
+            def extension = FilenameUtils.getExtension(imagePath)
+            def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
+            def image = [
+                    thumb : pathWithoutExt + "__thumb."+extension,
+                    small : pathWithoutExt + "__small."+extension,
+                    large : pathWithoutExt + "__large."+extension,
+                    raw : imagePath,
+            ]
+            mapOfProperties['images'] = [image]
+        }
     }
 
     def list(){
@@ -71,6 +79,7 @@ class RecordController {
             def id = mapOfProperties["_id"].toString()
             mapOfProperties["id"] = id
             mapOfProperties.remove("_id")
+            setupMediaUrls(mapOfProperties)
             records.add(mapOfProperties)
         }
         render(contentType: "text/json") { records }
@@ -90,6 +99,7 @@ class RecordController {
             def id = mapOfProperties["_id"].toString()
             mapOfProperties["id"] = id
             mapOfProperties.remove("_id")
+            setupMediaUrls(mapOfProperties)
             records.add(mapOfProperties)
         }
         render(contentType: "text/json") { records }
