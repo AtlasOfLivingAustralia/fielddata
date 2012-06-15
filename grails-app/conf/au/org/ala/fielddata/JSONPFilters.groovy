@@ -12,9 +12,17 @@ class JSONPFilters {
 
             }
             after = { Map model ->
-                println("After.....")
 
-
+                def ct = response.getContentType()
+                println("content type: "  + ct)
+                if(ct?.contains("application/json")){
+                    String resp = model as JSON
+                    if(params.callback) {
+                        resp = params.callback + "(" + resp + ")"
+                    }
+                    render (contentType: "application/json", text: resp)
+                    false
+                }
             }
             afterView = { Exception e ->
 

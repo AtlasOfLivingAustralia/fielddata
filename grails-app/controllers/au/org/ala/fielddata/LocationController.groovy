@@ -19,7 +19,8 @@ class LocationController {
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
 
-        render(contentType: "text/json") { mapOfProperties }
+        response.setContentType("application/json")
+        [record:mapOfProperties]
     }
 
     def create(){
@@ -39,7 +40,9 @@ class LocationController {
             response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/location/" + createdLocation.getId())
             response.addHeader("entityId", createdLocation.getId())
             //download the supplied images......
-            render(contentType: "text/json") { [id:createdLocation.getId().toString()] }
+            response.setContentType("application/json")
+            [id:createdLocation.getId().toString()]
+
         } else {
             response.sendError(400, 'Missing userId')
         }
@@ -50,7 +53,9 @@ class LocationController {
         if (l){
             l.delete(flush: true)
             response.setStatus(200)
-            render(contentType: "text/json") { [success:"OK"] }
+            response.setContentType("application/json")
+            [success:"OK"]
+
         } else {
             response.setStatus(400)
         }
@@ -62,7 +67,8 @@ class LocationController {
             it.delete(flush: true)
         }
         response.setStatus(200)
-        render(contentType: "text/json") { [success:"OK"] }
+        response.setContentType("application/json")
+        [success:"OK"]
     }
 
     def listForUser(){
@@ -81,7 +87,8 @@ class LocationController {
             mapOfProperties.remove("_id")
             locations.add(mapOfProperties)
         }
-        render(contentType: "text/json") { locations }
+        response.setContentType("application/json")
+        [locations: locations]
     }
 
     def list(){
@@ -100,6 +107,7 @@ class LocationController {
             mapOfProperties.remove("_id")
             locations.add(mapOfProperties)
         }
-        render(contentType: "text/json") { locations }
+        response.setContentType("application/json")
+        [locations: locations]
     }
 }

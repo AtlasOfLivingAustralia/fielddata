@@ -1,7 +1,6 @@
 package au.org.ala.fielddata
 
 import groovy.json.JsonSlurper
-import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 
 class RecordController {
@@ -22,7 +21,8 @@ class RecordController {
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
         setupMediaUrls(mapOfProperties)
-        render(contentType: "text/json") { mapOfProperties }
+        response.setContentType("application/json")
+        [record:mapOfProperties]
     }
 
     def listRecordWithImages(){
@@ -48,7 +48,8 @@ class RecordController {
             setupMediaUrls(mapOfProperties)
             records.add(mapOfProperties)
         }
-        render(contentType: "text/json") { records }
+        response.setContentType("application/json")
+        [records:records]
     }
 
     boolean isCollectionOrArray(object) {
@@ -110,7 +111,8 @@ class RecordController {
             setupMediaUrls(mapOfProperties)
             records.add(mapOfProperties)
         }
-        render(contentType: "text/json") { records }
+        response.setContentType("application/json")
+        [records:records]
     }
 
     def listForUser(){
@@ -120,7 +122,7 @@ class RecordController {
         def offset = params.start ?: 0
         def max = params.pageSize ?: 10
 
-        println("Retrieving a list for user:"  + params.userId)
+        log.debug("Retrieving a list for user:"  + params.userId)
         Record.findAllWhere([userID:params.userID], [sort:sort,order:order,offset:offset,max:max]).each {
             def dbo = it.getProperty("dbo")
             def mapOfProperties = dbo.toMap()
@@ -130,7 +132,8 @@ class RecordController {
             setupMediaUrls(mapOfProperties)
             records.add(mapOfProperties)
         }
-        render(contentType: "text/json") { records }
+        response.setContentType("application/json")
+        [records:records]
     }
 
     def deleteById(){
@@ -158,7 +161,9 @@ class RecordController {
             response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
             response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
             response.addHeader("entityId", r.id.toString())
-            render(contentType: "text/json") { [id:r.id.toString()] }
+
+            response.setContentType("application/json")
+            [id:r.id.toString()]
         } else {
             response.sendError(400, 'Missing userId')
         }
@@ -198,5 +203,13 @@ class RecordController {
         response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
         response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
         response.addHeader("entityId", r.id.toString())
+        [id:r.id.toString()]
     }
+
+
+    def typeMapping = [
+            "decimalLatitude" : "Float",
+            "decimalLongitude" : "Float",
+            "eventDate" : "Date",
+    ]
 }

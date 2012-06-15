@@ -12,7 +12,7 @@ class ImportController {
 
         def columns = []
 
-        println "Starting....."
+        log.debug "Starting....."
         def count = 0
 
         new File(params.filePath).eachCsvLine {
@@ -28,7 +28,7 @@ class ImportController {
                     }
                 }
                 r = r.save(flush: true)
-                println(r.id)
+                log.debug(r.id)
 
                 //r = Record.get(r.id)
 
@@ -41,7 +41,7 @@ class ImportController {
                         r['associatedMedia'] = mediaFile.getAbsolutePath()
                         r.save(flush:true)
                     } else {
-                        println "Unable to import media for path: " +  associatedMediaPath
+                        log.error "Unable to import media for path: " +  associatedMediaPath
                         r['associatedMedia'] = null
                         r.save(flush:true)
                     }
