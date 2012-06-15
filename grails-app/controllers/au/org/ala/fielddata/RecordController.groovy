@@ -4,7 +4,6 @@ import groovy.json.JsonSlurper
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 
-
 class RecordController {
 
     def grailsApplication
@@ -154,53 +153,50 @@ class RecordController {
             json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
             Record r = new Record()
             r = r.save(true)
-            json.each {
-                if(!ignores.contains(it.key)){
-                    r[it.key] = it.value
-                }
-            }
-
-            //look for associated media.....
-            if (List.isCase(json.associatedMedia)){
-
-                def mediaFiles = []
-
-                json.associatedMedia.eachWithIndex() { obj, i ->
-                    def createdFile = mediaService.download(r.id.toString(), i, obj)
-                    mediaFiles.add createdFile.getAbsolutePath()
-                }
-
-                r['associatedMedia'] = mediaFiles
-            } else {
-                def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
-                r['associatedMedia'] = createdFile.getAbsolutePath()
-            }
-
-            r.save(flush: true)
-
-           // r.errors.each { println it}
+            updateRecord(r,json)
+            //download the supplied images......
             response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
             response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
             response.addHeader("entityId", r.id.toString())
-            //download the supplied images......
             render(contentType: "text/json") { [id:r.id.toString()] }
         } else {
             response.sendError(400, 'Missing userId')
         }
     }
 
+    private def updateRecord(r, json){
 
+        json.each {
+            if(!ignores.contains(it.key)){
+                r[it.key] = it.value
+            }
+        }
+        //look for associated media.....
+        if (List.isCase(json.associatedMedia)){
+
+            def mediaFiles = []
+
+            json.associatedMedia.eachWithIndex() { obj, i ->
+                def createdFile = mediaService.download(r.id.toString(), i, obj)
+                mediaFiles.add createdFile.getAbsolutePath()
+            }
+
+            r['associatedMedia'] = mediaFiles
+        } else {
+            def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
+            r['associatedMedia'] = createdFile.getAbsolutePath()
+        }
+        r.save(flush: true)
+    }
 
     def updateById(){
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
         json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
         Record r = Record.get(params.id)
-        json.each {
-            if(!ignores.contains(it.key)){
-                r[it.key] = it.value
-            }
-        }
-        r.save(flush: true)
+        updateRecord(r,json)
+        response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
+        response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
+        response.addHeader("entityId", r.id.toString())
     }
 }
