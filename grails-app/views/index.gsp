@@ -33,7 +33,7 @@
             <ul class="webserviceList">
                 <li>
                     <strong>Get record</strong>
-                    - HTTP GET on /record/&lt;ID&gt; e.g <a href="record/4fbda572300435cfcea321ab">record/4fbda572300435cfcea321ab</a>
+                    - HTTP GET on /record/&lt;ID&gt; e.g /record/4fbda572300435cfcea321ab
                 </li>
                 <li>
                     <strong>Create record</strong>
@@ -51,6 +51,11 @@
                     "collector":"Aussie Bob",
                     "associatedMedia":"http://bie.ala.org.au/repo/1013/128/1280064/thumbnail.jpg"
                     }
+                    </p>
+
+                    For multiple images, use a JSON array e.g.
+                    <p class="code">
+                    { "eventDate":"2001-01-01", "decimalLatitude":13.2, "decimalLongitude":143.2, "userId":"david.martin@csiro.au", "scientificName":"Aus bus", "commonName":"Feret", "collector":"Aussie Bob", "associatedMedia":["http://bie.ala.org.au/repo/1013/128/1280064/thumbnail.jpg","http://bie.ala.org.au/repo/1013/128/1280064/thumbnail.jpg"] }
                     </p>
                 </li>
                 <li>

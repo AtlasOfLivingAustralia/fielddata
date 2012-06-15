@@ -9,7 +9,9 @@ class RecordController {
 
     def grailsApplication
 
-    def ignores = ["decimalLatitude","decimalLongitude","eventDate","action","controller"]
+    def mediaService
+
+    def ignores = ["action","controller","associatedMedia"]
 
     def getById(){
         Record r = Record.get(params.id)
@@ -21,7 +23,7 @@ class RecordController {
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
         setupMediaUrls(mapOfProperties)
-        mapOfProperties
+        render(contentType: "text/json") { mapOfProperties }
     }
 
     def listRecordWithImages(){
@@ -50,19 +52,46 @@ class RecordController {
         render(contentType: "text/json") { records }
     }
 
+    boolean isCollectionOrArray(object) {
+        [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
+    }
+
     def setupMediaUrls(mapOfProperties){
         if (mapOfProperties["associatedMedia"] != null){
-            def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
-                    grailsApplication.config.fielddata.mediaUrl)
-            def extension = FilenameUtils.getExtension(imagePath)
-            def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
-            def image = [
-                    thumb : pathWithoutExt + "__thumb."+extension,
-                    small : pathWithoutExt + "__small."+extension,
-                    large : pathWithoutExt + "__large."+extension,
-                    raw : imagePath,
-            ]
-            mapOfProperties['images'] = [image]
+
+            if (isCollectionOrArray(mapOfProperties["associatedMedia"])){
+
+                def imagesArray = []
+
+                mapOfProperties["associatedMedia"].each {
+
+                    def imagePath = it.replaceAll(grailsApplication.config.fielddata.mediaDir,
+                            grailsApplication.config.fielddata.mediaUrl)
+                    def extension = FilenameUtils.getExtension(imagePath)
+                    def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
+                    def image = [
+                            thumb : pathWithoutExt + "__thumb."+extension,
+                            small : pathWithoutExt + "__small."+extension,
+                            large : pathWithoutExt + "__large."+extension,
+                            raw : imagePath,
+                    ]
+
+                    imagesArray.add(image)
+                }
+                mapOfProperties['images'] = imagesArray
+            } else {
+                def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
+                        grailsApplication.config.fielddata.mediaUrl)
+                def extension = FilenameUtils.getExtension(imagePath)
+                def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
+                def image = [
+                        thumb : pathWithoutExt + "__thumb."+extension,
+                        small : pathWithoutExt + "__small."+extension,
+                        large : pathWithoutExt + "__large."+extension,
+                        raw : imagePath,
+                ]
+                mapOfProperties['images'] = [image]
+            }
         }
     }
 
@@ -93,7 +122,7 @@ class RecordController {
         def max = params.pageSize ?: 10
 
         println("Retrieving a list for user:"  + params.userId)
-        Record.findAllWhere([userId:params.userId], [sort:sort,order:order,offset:offset,max:max]).each {
+        Record.findAllWhere([userID:params.userID], [sort:sort,order:order,offset:offset,max:max]).each {
             def dbo = it.getProperty("dbo")
             def mapOfProperties = dbo.toMap()
             def id = mapOfProperties["_id"].toString()
@@ -123,7 +152,8 @@ class RecordController {
         def json = jsonSlurper.parse(request.getReader())
         if (json.userId){
             json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
-            Record r = new Record(json)
+            Record r = new Record()
+            r = r.save(true)
             json.each {
                 if(!ignores.contains(it.key)){
                     r[it.key] = it.value
@@ -132,39 +162,34 @@ class RecordController {
 
             //look for associated media.....
             if (List.isCase(json.associatedMedia)){
+
+                def mediaFiles = []
+
                 json.associatedMedia.eachWithIndex() { obj, i ->
-                    //download to file system....
-                   // println("Media to download: " + obj)
-                    //download to file
-                    download(i, obj)
+                    def createdFile = mediaService.download(r.id.toString(), i, obj)
+                    mediaFiles.add createdFile.getAbsolutePath()
                 }
+
+                r['associatedMedia'] = mediaFiles
             } else {
-                download(json.associatedMedia)
+                def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
+                r['associatedMedia'] = createdFile.getAbsolutePath()
             }
 
-            Record createdRecord = r.save(true)
+            r.save(flush: true)
+
            // r.errors.each { println it}
-            response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + createdRecord.getId())
-            response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + createdRecord.getId())
-            response.addHeader("entityId", createdRecord.getId())
+            response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
+            response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
+            response.addHeader("entityId", r.id.toString())
             //download the supplied images......
-            render(contentType: "text/json") { [id:createdRecord.getId().toString()] }
+            render(contentType: "text/json") { [id:r.id.toString()] }
         } else {
             response.sendError(400, 'Missing userId')
         }
     }
 
-    private def download(idx, address){
-        File mediaDir = new File(grailsApplication.config.fielddata.mediaDir)
-        if (!mediaDir.exists()){
-            FileUtils.forceMkdir(mediaDir)
-        }
-        def file = new FileOutputStream(grailsApplication.config.fielddata.mediaDir + idx + "_" +address.tokenize("/")[-1])
-        def out = new BufferedOutputStream(file)
-        log.debug("Trying to download..." + address)
-        out << new URL(address).openStream()
-        out.close()
-    }
+
 
     def updateById(){
         def jsonSlurper = new JsonSlurper()

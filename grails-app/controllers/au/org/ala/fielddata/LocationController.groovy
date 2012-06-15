@@ -73,7 +73,7 @@ class LocationController {
         def max = params.pageSize ?: 10
 
         log.debug("Retrieving a list for user:"  + params.userId)
-        Location.findAllWhere([userId:params.userId], [sort:sort,order:order,offset:offset,max:max]).each {
+        Location.findAllWhere([userID:params.userID], [sort:sort,order:order,offset:offset,max:max]).each {
             def dbo = it.getProperty("dbo")
             def mapOfProperties = dbo.toMap()
             def id = mapOfProperties["_id"].toString()

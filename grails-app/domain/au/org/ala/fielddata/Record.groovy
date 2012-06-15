@@ -8,8 +8,8 @@ class Record {
     String eventDate
     String decimalLatitude
     String decimalLongitude
-    String userId
-    String associatedMedia
+    String userID
+    //List associatedMedia
     Date dateCreated
     Date lastUpdated
 
@@ -17,7 +17,7 @@ class Record {
         eventDate nullable:true
         decimalLatitude nullable:true
         decimalLongitude nullable:true
-        userId nullable: true
-        associatedMedia nullable: true
+        userID nullable: true
+        //associatedMedia nullable: true
     }
 }

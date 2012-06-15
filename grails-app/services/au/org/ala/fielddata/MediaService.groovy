@@ -15,7 +15,6 @@ class MediaService {
 
     def serviceMethod() {}
 
-
     def File copyToImageDir(recordId,currentFilePath){
 
         File directory = new File(grailsApplication.config.fielddata.mediaDir + recordId)
@@ -37,6 +36,21 @@ class MediaService {
             null
         }
     }
+
+    def download(recordId, idx, address){
+        File mediaDir = new File(grailsApplication.config.fielddata.mediaDir  + recordId + File.separator)
+        if (!mediaDir.exists()){
+            FileUtils.forceMkdir(mediaDir)
+        }
+        def destFile = new File(grailsApplication.config.fielddata.mediaDir + recordId + File.separator + idx + "_" +address.tokenize("/")[-1])
+        def out = new BufferedOutputStream(new FileOutputStream(destFile))
+        log.debug("Trying to download..." + address)
+        out << new URL(address).openStream()
+        out.close()
+        generateAllSizes(destFile)
+        destFile
+    }
+
 
     /** Generate thumbnails of all sizes */
     def generateAllSizes(File source){
