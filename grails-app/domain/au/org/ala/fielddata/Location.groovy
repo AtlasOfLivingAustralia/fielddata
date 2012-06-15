@@ -4,6 +4,8 @@ import org.bson.types.ObjectId
 
 class Location {
 
+    static mapping = { version false }
+
     ObjectId id
     String userId
     String locality

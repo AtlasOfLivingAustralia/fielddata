@@ -4,6 +4,8 @@ import org.bson.types.ObjectId
 
 class Record {
 
+    static mapping = { version false }
+
     ObjectId id
     String eventDate
     String decimalLatitude
