@@ -38,7 +38,9 @@
                 <li>
                     <strong>Create record</strong>
                     - HTTP POST with JSON body to "/record/". The URL for the created record will be in the
-                    "Content-Location" http header in the response.<br/>
+                    "Content-Location" http header in the response.
+                    The JSON body can support any additional key value pairs which will be persisted with the record.
+                    <br/>
                     Example body:
                     <p class="code">
                     {
@@ -61,7 +63,9 @@
                 <li>
                     <strong>Update record</strong>
                     - HTTP POST with JSON body to "/record/&lt;ID&gt;". The URL for the updated record will be in
-                    the "Content-Location" http header in the response.<br/>
+                    the "Content-Location" http header in the response.
+                    The JSON body can support any additional key value pairs which will be persisted with the record.
+                    <br/>
                     Example body:
                     <p class="code">
                         {
@@ -120,18 +124,11 @@
             <h3>Bookmarked locations</h3>
             <ul class="webserviceList">
                 <li>
-                    <strong>List for user</strong>
-                    - HTTP GET /location/user
-                    <ul class="paramsList">
-                        <li>sort  - the property to sort results by. Default is dateCreated</li>
-                        <li>order - "asc" or "desc"</li>
-                        <li>start - offset to use for paging. default is 0</li>
-                        <li>pageSize - Page size to use. default is 30</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>Add</strong>
-                    - HTTP POST with JSON body
+                    <strong>Add location</strong>
+                    - HTTP POST with JSON body to /location.
+                    Note the <strong>UserId</strong> is mandatory.
+                The JSON body can support any additional key value pairs, and these will be persisted with the record
+                and returned in /location/&lt;ID&gt; requests.
                     <p class="code">
                         {
                         "decimalLatitude":13.2,
@@ -142,11 +139,21 @@
                     </p>
                 </li>
                 <li>
+                    <strong>List for user</strong>
+                    - HTTP GET /location/user
+                    <ul class="paramsList">
+                        <li>sort  - the property to sort results by. Default is dateCreated</li>
+                        <li>order - "asc" or "desc"</li>
+                        <li>start - offset to use for paging. default is 0</li>
+                        <li>pageSize - Page size to use. default is 30</li>
+                    </ul>
+                </li>
+                <li>
                     <strong>Delete</strong>
                     - HTTP DELETE on /location/&lt;ID&gt;
                 </li>
                 <li>
-                    <strong>Delete All</strong>
+                    <strong>Delete All locations for user</strong>
                     - HTTP DELETE /location/user
                 </li>
             </ul>
