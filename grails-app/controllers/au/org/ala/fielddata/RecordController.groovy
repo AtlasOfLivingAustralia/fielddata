@@ -187,7 +187,7 @@ class RecordController {
             }
 
             r['associatedMedia'] = mediaFiles
-        } else {
+        } else if(json.associatedMedia) {
             def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
             r['associatedMedia'] = createdFile.getAbsolutePath()
         }

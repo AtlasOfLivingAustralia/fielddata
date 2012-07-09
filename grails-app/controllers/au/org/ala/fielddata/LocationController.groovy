@@ -36,9 +36,9 @@ class LocationController {
             }
             Location createdLocation = l.save(true)
             // r.errors.each { println it}
-            response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/location/" + createdLocation.getId())
-            response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/location/" + createdLocation.getId())
-            response.addHeader("entityId", createdLocation.getId())
+            response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/location/" + createdLocation.getId().toString())
+            response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/location/" + createdLocation.getId().toString())
+            response.addHeader("entityId", createdLocation.getId().toString())
             //download the supplied images......
             response.setContentType("application/json")
             [id:createdLocation.getId().toString()]
