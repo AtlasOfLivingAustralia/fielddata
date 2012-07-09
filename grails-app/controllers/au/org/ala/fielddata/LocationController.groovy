@@ -42,7 +42,6 @@ class LocationController {
             //download the supplied images......
             response.setContentType("application/json")
             [id:createdLocation.getId().toString()]
-
         } else {
             response.sendError(400, 'Missing userId')
         }
@@ -55,7 +54,6 @@ class LocationController {
             response.setStatus(200)
             response.setContentType("application/json")
             [success:"OK"]
-
         } else {
             response.setStatus(400)
         }

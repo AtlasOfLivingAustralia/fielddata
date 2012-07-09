@@ -7,14 +7,12 @@ class JSONPFilters {
     def filters = {
         all(controller:'*', action:'*') {
             before = {
-                println("Before.....")
-
-
+               // println("Before.....")
             }
             after = { Map model ->
 
                 def ct = response.getContentType()
-                println("content type: "  + ct)
+                //println("content type: "  + ct)
                 if(ct?.contains("application/json")){
                     String resp = model as JSON
                     if(params.callback) {
