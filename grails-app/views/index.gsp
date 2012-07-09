@@ -111,7 +111,7 @@
             <ul class="webserviceList">
                 <li>
                     <strong>List records with images</strong>
-                    - HTTP GET on the URL /images/
+                    - HTTP GET on the URL <a href="images">/images/</a>
                     <ul class="paramsList">
                         <li>sort  - the property to sort results by. Default is dateCreated</li>
                         <li>order - "asc" or "desc"</li>
