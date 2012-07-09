@@ -123,7 +123,7 @@ class RecordController {
         def max = params.pageSize ?: 10
 
         log.debug("Retrieving a list for user:"  + params.userId)
-        Record.findAllWhere([userID:params.userID], [sort:sort,order:order,offset:offset,max:max]).each {
+        Record.findAllWhere([userId:params.userId], [sort:sort,order:order,offset:offset,max:max]).each {
             def dbo = it.getProperty("dbo")
             def mapOfProperties = dbo.toMap()
             def id = mapOfProperties["_id"].toString()
