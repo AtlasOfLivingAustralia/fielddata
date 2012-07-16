@@ -11,16 +11,20 @@ class LocationController {
 
     def getById(){
         Location r = Location.get(params.id)
-        r.metaPropertyValues.each { println "meta: "  + it.name }
-        def dbo = r.getProperty("dbo")
+        if(r){
+            r.metaPropertyValues.each { println "meta: "  + it.name }
+            def dbo = r.getProperty("dbo")
 
-        def mapOfProperties = dbo.toMap()
-        def id = mapOfProperties["_id"].toString()
-        mapOfProperties["id"] = id
-        mapOfProperties.remove("_id")
+            def mapOfProperties = dbo.toMap()
+            def id = mapOfProperties["_id"].toString()
+            mapOfProperties["id"] = id
+            mapOfProperties.remove("_id")
 
-        response.setContentType("application/json")
-        [record:mapOfProperties]
+            response.setContentType("application/json")
+            [record:mapOfProperties]
+        } else {
+            response.sendError(404, 'Unrecognised Location ID. This location may have been removed.')
+        }
     }
 
     def create(){
@@ -47,7 +51,7 @@ class LocationController {
         }
     }
 
-    def delete(){
+    def deleteById(){
         Location l = Location.get(params.id)
         if (l){
             l.delete(flush: true)

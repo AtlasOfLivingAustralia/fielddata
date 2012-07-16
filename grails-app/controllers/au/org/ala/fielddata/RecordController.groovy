@@ -13,16 +13,20 @@ class RecordController {
 
     def getById(){
         Record r = Record.get(params.id)
-       // r.metaPropertyValues.each { println "meta: "  + it.name }
-        def dbo = r.getProperty("dbo")
+        if(r){
+           // r.metaPropertyValues.each { println "meta: "  + it.name }
+            def dbo = r.getProperty("dbo")
 
-        def mapOfProperties = dbo.toMap()
-        def id = mapOfProperties["_id"].toString()
-        mapOfProperties["id"] = id
-        mapOfProperties.remove("_id")
-        setupMediaUrls(mapOfProperties)
-        response.setContentType("application/json")
-        [record:mapOfProperties]
+            def mapOfProperties = dbo.toMap()
+            def id = mapOfProperties["_id"].toString()
+            mapOfProperties["id"] = id
+            mapOfProperties.remove("_id")
+            setupMediaUrls(mapOfProperties)
+            response.setContentType("application/json")
+            [record:mapOfProperties]
+        } else {
+            response.sendError(404, 'Unrecognised Record ID. This record may have been removed.')
+        }
     }
 
     def listRecordWithImages(){

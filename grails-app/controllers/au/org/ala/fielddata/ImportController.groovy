@@ -4,8 +4,6 @@ class ImportController {
 
     def mediaService
 
-
-
     def index() { }
 
     def importFile(){
