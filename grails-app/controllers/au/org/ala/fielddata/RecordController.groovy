@@ -111,6 +111,7 @@ class RecordController {
             def mapOfProperties = dbo.toMap()
             def id = mapOfProperties["_id"].toString()
             mapOfProperties["id"] = id
+            //mapOfProperties["eventDate"] = it.eventDate?.format("yyyy-MM-dd")
             mapOfProperties.remove("_id")
             setupMediaUrls(mapOfProperties)
             records.add(mapOfProperties)

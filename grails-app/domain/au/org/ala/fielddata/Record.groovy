@@ -7,7 +7,7 @@ class Record {
     static mapping = { version false }
 
     ObjectId id
-    String eventDate
+    Date eventDate
     String decimalLatitude
     String decimalLongitude
     String userId

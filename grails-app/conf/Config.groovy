@@ -70,16 +70,24 @@ grails.hibernate.cache.queries = true
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://moyesyside.ala.org.au:8080"
-        fielddata.mediaUrl = "http://moyesyside.ala.org.au/~davemartin/fielddata/media/"
-        fielddata.mediaDir = "/Users/davemartin/Sites/fielddata/media/"
+        grails.serverURL = "http://moyesyside.ala.org.au:8086"
+        fielddata.mediaUrl = "http://moyesyside.ala.org.au/fielddata/"
+        fielddata.mediaDir = "/data/fielddata/"
     }
     production {
+    /*
         grails.logging.jul.usebridge = false
         grails.serverURL = "http://audax.ala.org.au:8080"
         grails.serverURL = "http://audax.ala.org.au:8080"
         fielddata.mediaUrl = "http://audax.ala.org.au/~mar759/fielddata/media/"
         fielddata.mediaDir = "/Users/mar759/Sites/fielddata/media/"
+        */
+        
+        grails.logging.jul.usebridge = false
+        grails.serverURL = "http://115.146.94.38:8080"
+        grails.serverURL = "http://115.146.94.38:8080"
+        fielddata.mediaUrl = "http://115.146.94.38/fielddata/media/"
+        fielddata.mediaDir = "/tmp/fielddata/media/"        
     }
 }
 
@@ -96,16 +104,16 @@ log4j = {
 
         environments {
             production {
-              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/var/log/tomcat6/postie.log", threshold: org.apache.log4j.Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}] %m%n")
+              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/var/log/tomcat6/fielddata.log", threshold: org.apache.log4j.Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}] %m%n")
               'null' name: "stacktrace"
             }
             development {
               console name: "stdout", layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n"), threshold: org.apache.log4j.Level.DEBUG
-              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/tmp/postie.log", threshold: org.apache.log4j.Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n")
+              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/tmp/fielddata.log", threshold: org.apache.log4j.Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n")
               'null' name: "stacktrace"
             }
             test {
-              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/tmp/postie-test.log", threshold: org.apache.log4j.Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n")
+              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/tmp/fielddata-test.log", threshold: org.apache.log4j.Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n")
               'null' name: "stacktrace"
             }
         }

@@ -12,7 +12,7 @@ grails.project.dependency.resolution = {
         // uncomment to disable ehcache
         // excludes 'ehcache'
     }
-    log "info" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    log "error" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     checksums true // Whether to verify checksums on resolve
 
     repositories {
@@ -37,16 +37,18 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.16'
         //build 'au.org.ala:ala-cas-client:1.0-SNAPSHOT'
         //build 'org.jasig.cas:cas-client-core:3.1.10'
-        build 'javax.media:jai-core:1.1.3'
-        build 'javax.media:jai-codec:1.1.3'
-        build 'javax.media:jai-imageio:1.1'
+
+        //build 'javax.media:jai-core:1.1.3'
+       // build 'javax.media:jai-codec:1.1.3'
+       // build 'javax.media:jai-imageio:1.1'
+         build 'org.imgscalr:imgscalr-lib:4.2'
     }
 
     plugins {
         //runtime ":hibernate:$grailsVersion"
         runtime ":jquery:1.7.1"
         runtime ":resources:1.1.6"
-
+        compile ":mongodb:1.0.0.GA"
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0"
         //runtime ":cached-resources:1.0"
