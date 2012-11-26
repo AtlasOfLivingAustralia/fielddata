@@ -33,7 +33,7 @@ class ThumbnailableImage {
 //        }
 
         //def renderedImage = originalImage.createSnapshot() as javax.media.jai.RenderedOp
-        println("height: " + height + ", edgeLength: " + edgeLength + ", width:  " + width)
+        //println("height: " + height + ", edgeLength: " + edgeLength + ", width:  " + width)
 
         if (width > edgeLength) {
             //def denom = height > width ? height : width

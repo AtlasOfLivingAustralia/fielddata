@@ -13,6 +13,9 @@ class UrlMappings {
         "/location/user/$userId"(controller: "location"){ action = [GET:"listForUser", DELETE: "deleteAllForUser"] }
         "/location/$id"(controller: "location"){ action = [GET:"getById", PUT:"updateById", DELETE:"deleteById", POST:"updateById"] }
 
+        "/media/$dir/$fileName"(controller: "media"){ action = [GET:"getImage"] }
+
+
         "/$controller/$action?/$id?"{
 			constraints {
 				// apply constraints here

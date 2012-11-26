@@ -10,6 +10,8 @@ class LocationController {
     def ignores = ["decimalLatitude","decimalLongitude","action","controller"]
 
     def getById(){
+
+        println("Get location by ID: " + params.id)
         Location r = Location.get(params.id)
         if(r){
             r.metaPropertyValues.each { println "meta: "  + it.name }

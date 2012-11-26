@@ -166,7 +166,6 @@ class RecordController {
             response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
             response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
             response.addHeader("entityId", r.id.toString())
-
             response.setContentType("application/json")
             [id:r.id.toString()]
         } else {
@@ -211,7 +210,6 @@ class RecordController {
         response.setContentType("application/json")
         [id:r.id.toString()]
     }
-
 
     def typeMapping = [
             "decimalLatitude" : "Float",

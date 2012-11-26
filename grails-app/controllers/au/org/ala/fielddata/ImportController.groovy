@@ -1,5 +1,7 @@
 package au.org.ala.fielddata
 
+import org.apache.commons.lang.time.DateUtils
+
 class ImportController {
 
     def mediaService
@@ -11,6 +13,8 @@ class ImportController {
         def columns = []
 
         log.debug "Starting....."
+        String[] dateFormats = ["yyyy-MM-dd hh:mm:ss.s"]
+
         def count = 0
 
         new File(params.filePath).eachCsvLine {
@@ -22,7 +26,11 @@ class ImportController {
                 it.eachWithIndex { column, idx ->
                     println("Field debug : " + columns[idx] + " : " + column)
                     if(column != null && column != "") {
-                        r[columns[idx]] = column
+                        if(columns[idx] == "eventDate"){
+                            r[columns[idx]] = DateUtils.parseDate(column, dateFormats)
+                        } else {
+                            r[columns[idx]] = column
+                        }
                     }
                 }
                 r = r.save(flush: true)
@@ -47,7 +55,6 @@ class ImportController {
             }
             //println it[0]
         }
-
         println "Starting....."
     }
 }

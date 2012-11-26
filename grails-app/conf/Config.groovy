@@ -75,19 +75,11 @@ environments {
         fielddata.mediaDir = "/data/fielddata/"
     }
     production {
-    /*
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://audax.ala.org.au:8080"
-        grails.serverURL = "http://audax.ala.org.au:8080"
-        fielddata.mediaUrl = "http://audax.ala.org.au/~mar759/fielddata/media/"
-        fielddata.mediaDir = "/Users/mar759/Sites/fielddata/media/"
-        */
-        
-        grails.logging.jul.usebridge = false
-        grails.serverURL = "http://115.146.94.38:8080"
-        grails.serverURL = "http://115.146.94.38:8080"
-        fielddata.mediaUrl = "http://115.146.94.38/fielddata/media/"
-        fielddata.mediaDir = "/tmp/fielddata/media/"        
+        grails.serverURL = "http://fielddata.ala.org.au"
+        grails.serverURL = "http://fielddata.ala.org.au"
+        fielddata.mediaUrl = "http://fielddata.ala.org.au/media/"
+        fielddata.mediaDir = "/data/fielddata/media/"
     }
 }
 
