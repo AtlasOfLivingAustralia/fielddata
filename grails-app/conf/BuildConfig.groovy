@@ -41,7 +41,12 @@ grails.project.dependency.resolution = {
         //build 'javax.media:jai-core:1.1.3'
        // build 'javax.media:jai-codec:1.1.3'
        // build 'javax.media:jai-imageio:1.1'
-         build 'org.imgscalr:imgscalr-lib:4.2'
+        runtime 'org.imgscalr:imgscalr-lib:4.2'
+        runtime 'org.apache.httpcomponents:httpcore:4.1.2'
+        runtime 'org.apache.httpcomponents:httpclient:4.1.2'
+        runtime 'org.apache.httpcomponents:httpcore:4.1.2'
+        runtime 'org.apache.httpcomponents:httpclient:4.1.2'
+        compile 'org.codehaus.gpars:gpars:0.11'
     }
 
     plugins {

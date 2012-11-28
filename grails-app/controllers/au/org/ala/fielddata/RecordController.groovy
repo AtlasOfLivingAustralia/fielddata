@@ -99,6 +99,11 @@ class RecordController {
         }
     }
 
+    def count(){
+        response.setContentType("application/json")
+        [count:Record.count()]
+    }
+
     def list(){
         def records = []
         def sort = params.sort ?: "dateCreated"

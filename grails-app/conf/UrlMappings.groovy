@@ -2,9 +2,11 @@ class UrlMappings {
 
 	static mappings = {
 
-        "/images"(controller: "record"){ action = [GET:"listRecordWithImages"] }
+
+        "/images/"(controller: "record"){ action = [GET:"listRecordWithImages"] }
         "/record"(controller: "record"){ action = [GET:"list", POST:"create"] }
         "/record/"(controller: "record"){ action = [GET:"list", POST:"create"] }
+        "/record/count"(controller: "record"){ action = [GET:"count"] }
         "/record/user/$userId"(controller: "record", action: "listForUser")
         "/record/$id"(controller: "record"){ action = [GET:"getById", PUT:"updateById", DELETE:"deleteById", POST:"updateById"] }
 

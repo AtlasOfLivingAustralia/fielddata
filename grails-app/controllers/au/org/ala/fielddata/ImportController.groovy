@@ -2,59 +2,25 @@ package au.org.ala.fielddata
 
 import org.apache.commons.lang.time.DateUtils
 
+import static groovyx.gpars.actor.Actors.actor
+
 class ImportController {
 
-    def mediaService
+    def importService
 
     def index() { }
 
     def importFile(){
 
-        def columns = []
+       def filePath = params.filePath
 
-        log.debug "Starting....."
-        String[] dateFormats = ["yyyy-MM-dd hh:mm:ss.s"]
+       def theActor = actor {
+            println "Starting a thread....."
+            importService.loadFile(filePath)
+            println "Finishing thread."
+       }
 
-        def count = 0
-
-        new File(params.filePath).eachCsvLine {
-            count += 1
-            if(count == 1){
-                columns = it
-            } else {
-                Record r = new Record()
-                it.eachWithIndex { column, idx ->
-                    println("Field debug : " + columns[idx] + " : " + column)
-                    if(column != null && column != "") {
-                        if(columns[idx] == "eventDate"){
-                            r[columns[idx]] = DateUtils.parseDate(column, dateFormats)
-                        } else {
-                            r[columns[idx]] = column
-                        }
-                    }
-                }
-                r = r.save(flush: true)
-                log.debug(r.id)
-
-                //r = Record.get(r.id)
-
-                def mapOfProperties = r.dbo.toMap()
-                mapOfProperties.each { println "MoP:" + it}
-                if(mapOfProperties.get("associatedMedia")){
-                    def associatedMediaPath = r.getProperty("dbo")?.toMap().get("associatedMedia")
-                    def mediaFile = mediaService.copyToImageDir(r.id.toString(), associatedMediaPath)
-                    if(mediaFile != null){
-                        r['associatedMedia'] = mediaFile.getAbsolutePath()
-                        r.save(flush:true)
-                    } else {
-                        log.error "Unable to import media for path: " +  associatedMediaPath
-                        r['associatedMedia'] = null
-                        r.save(flush:true)
-                    }
-                }
-            }
-            //println it[0]
-        }
-        println "Starting....."
+       response.setContentType("application/json")
+       [started:true]
     }
 }
