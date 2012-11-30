@@ -9,9 +9,12 @@ class Location {
     ObjectId id
     String userId
     String locality
-    Float decimalLatitude
-    Float decimalLongitude
+    String decimalLatitude
+    String decimalLongitude
+    String geodeticDatum
     Date dateCreated
 
-    static constraints = {}
+    static constraints = {
+        geodeticDatum nullable:true
+    }
 }

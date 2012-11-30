@@ -14,9 +14,11 @@ headerAndFooter.baseURL = "http://www2.ala.org.au/commonui"
 security.cas.urlPattern = ""
 security.cas.loginUrl = "https://auth.ala.org.au/cas/login"
 security.cas.logoutUrl = "https://auth.ala.org.au/cas/logout"
-ala.baseURL = "http://www.ala.org.au"
+ala.baseURL = "http://www.ala.org.au/"
 bie.baseURL = "http://bie.ala.org.au"
 bie.searchPath = "/search"
+brokerURL = 'vm://localhost'
+enableJMS = false
 
 grails.project.groupId = "au.org.ala.fielddata" // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
@@ -73,6 +75,7 @@ environments {
         grails.serverURL = "http://moyesyside.ala.org.au:8086"
         fielddata.mediaUrl = "http://moyesyside.ala.org.au/fielddata/"
         fielddata.mediaDir = "/data/fielddata/"
+        //enableJMS = false
     }
     production {
         grails.logging.jul.usebridge = false
@@ -80,6 +83,7 @@ environments {
         grails.serverURL = "http://fielddata.ala.org.au"
         fielddata.mediaUrl = "http://fielddata.ala.org.au/media/"
         fielddata.mediaDir = "/data/fielddata/media/"
+        enableJMS = true
     }
 }
 

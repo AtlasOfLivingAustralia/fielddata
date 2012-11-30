@@ -11,7 +11,6 @@ class Record {
     String decimalLatitude
     String decimalLongitude
     String userId
-    //List associatedMedia
     Date dateCreated
     Date lastUpdated
 
@@ -20,6 +19,5 @@ class Record {
         decimalLatitude nullable:true
         decimalLongitude nullable:true
         userId nullable: true
-        //associatedMedia nullable: true
     }
 }

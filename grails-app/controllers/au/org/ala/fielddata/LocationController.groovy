@@ -7,7 +7,7 @@ class LocationController {
     static allowedMethods = [getById:'GET', create:'POST', delete:'DELETE', deleteAllForUser:'DELETE',
             retrieveAllForUser:'GET', retrieveAll:'GET']
 
-    def ignores = ["decimalLatitude","decimalLongitude","action","controller"]
+    def ignores = ["action","controller"]
 
     def getById(){
 
@@ -32,8 +32,15 @@ class LocationController {
     def create(){
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
-        if (json.userId){
-
+        if (!json.userId){
+            response.sendError(400, 'Missing userId')
+        } else if (!json.decimalLatitude){
+            response.sendError(400, 'Missing decimalLatitude')
+        } else if (!json.decimalLongitude){
+            response.sendError(400, 'Missing decimalLongitude')
+        } else if (!json.locality){
+            response.sendError(400, 'Missing locality')
+        } else {
             Location l = new Location(json)
             json.each {
                 if(!ignores.contains(it.key)){
@@ -48,8 +55,6 @@ class LocationController {
             //download the supplied images......
             response.setContentType("application/json")
             [id:createdLocation.getId().toString()]
-        } else {
-            response.sendError(400, 'Missing userId')
         }
     }
 

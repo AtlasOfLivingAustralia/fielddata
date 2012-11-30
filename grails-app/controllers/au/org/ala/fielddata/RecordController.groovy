@@ -9,18 +9,28 @@ class RecordController {
 
     def mediaService
 
+    def broadcastService
+
     def ignores = ["action","controller","associatedMedia"]
+
+    def testJMS() {
+		def message = "Hi, this is a Hello World with JMS & ActiveMQ, " + new Date()
+		sendJMSMessage("queue.notification", message)
+		render message
+    }
 
     def getById(){
         Record r = Record.get(params.id)
         if(r){
            // r.metaPropertyValues.each { println "meta: "  + it.name }
             def dbo = r.getProperty("dbo")
-
             def mapOfProperties = dbo.toMap()
             def id = mapOfProperties["_id"].toString()
             mapOfProperties["id"] = id
             mapOfProperties.remove("_id")
+            if(mapOfProperties["eventDate"]){
+                mapOfProperties["eventDate"] = mapOfProperties["eventDate"].format("yyyy-MM-dd")
+            }
             setupMediaUrls(mapOfProperties)
             response.setContentType("application/json")
             [record:mapOfProperties]
@@ -163,7 +173,9 @@ class RecordController {
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
         if (json.userId){
-            json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
+            if (json.eventDate){
+                json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
+            }
             Record r = new Record()
             r = r.save(true)
             updateRecord(r,json)
@@ -172,6 +184,9 @@ class RecordController {
             response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
             response.addHeader("entityId", r.id.toString())
             response.setContentType("application/json")
+
+            if(grailsApplication.config.enableJMS) broadcastService.sendCreate(r)
+
             [id:r.id.toString()]
         } else {
             response.sendError(400, 'Missing userId')
@@ -181,10 +196,17 @@ class RecordController {
     private def updateRecord(r, json){
 
         json.each {
-            if(!ignores.contains(it.key)){
-                r[it.key] = it.value
+            if(!ignores.contains(it.key) && it.value){
+                if (it.value && it.value instanceof BigDecimal ){
+                    println "Before: " + it.value
+                    r[it.key] = it.value.toString()
+                    println "After: " + r[it.key]
+                } else {
+                    r[it.key] = it.value
+                }
             }
         }
+
         //look for associated media.....
         if (List.isCase(json.associatedMedia)){
 
@@ -203,6 +225,20 @@ class RecordController {
         r.save(flush: true)
     }
 
+    def resyncRecord(){
+        def r = Record.get(params.id)
+        if (r) {
+            broadcastService.sendUpdate(r)
+            response.setStatus(200)
+        } else {
+            response.sendError(404)
+        }
+    }
+
+    def resyncAll(){
+        response.sendError(400)
+    }
+
     def updateById(){
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
@@ -213,6 +249,9 @@ class RecordController {
         response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
         response.addHeader("entityId", r.id.toString())
         response.setContentType("application/json")
+
+        if(grailsApplication.config.enableJMS) broadcastService.sendUpdate(r)
+
         [id:r.id.toString()]
     }
 

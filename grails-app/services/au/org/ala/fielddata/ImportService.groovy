@@ -18,27 +18,33 @@ class ImportService {
 
         new File(filePath).eachCsvLine {
             count += 1
-         //   println "Starting....." + count
+            println "Starting....." + count
             if(count == 1){
                 columns = it
             } else {
                 Record r = new Record()
                 it.eachWithIndex { column, idx ->
-                    //println("Field debug : " + columns[idx] + " : " + column)
+                    println("Field debug : " + columns[idx] + " : " + column)
                     if(column != null && column != "") {
-                        if(columns[idx] == "eventDate"){
-                            r[columns[idx]] = DateUtils.parseDate(column, dateFormats)
+                        if(columns[idx] == "eventDate" && column){
+                            try {
+                                r[columns[idx]] = DateUtils.parseDate(column, dateFormats)
+                            } catch (Exception e) {}
+                        } else if(columns[idx] == "decimalLatitude" && column && column != "null"){
+                            r[columns[idx]] = Float.parseFloat(column)
+                        } else if(columns[idx] == "decimalLongitude" && column && column != "null"){
+                            r[columns[idx]] = Float.parseFloat(column)
                         } else {
                             r[columns[idx]] = column
                         }
                     }
                 }
                 r = r.save(flush: true)
+
                 imported ++
                 log.info("Importing record: " + r.id + ", count: " + count + ", imported: " + imported + ", skipped: " + (count-imported))
 
                 def mapOfProperties = r.dbo.toMap()
-             //   mapOfProperties.each { println "MoP:" + it}
                 if(mapOfProperties.get("associatedMedia")){
                     def associatedMediaPath = r.getProperty("dbo")?.toMap().get("associatedMedia")
                     def mediaFile = mediaService.copyToImageDir(r.id.toString(), associatedMediaPath)

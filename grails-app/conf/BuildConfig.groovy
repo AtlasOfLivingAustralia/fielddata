@@ -33,32 +33,19 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-
-        // runtime 'mysql:mysql-connector-java:5.1.16'
-        //build 'au.org.ala:ala-cas-client:1.0-SNAPSHOT'
-        //build 'org.jasig.cas:cas-client-core:3.1.10'
-
-        //build 'javax.media:jai-core:1.1.3'
-       // build 'javax.media:jai-codec:1.1.3'
-       // build 'javax.media:jai-imageio:1.1'
         runtime 'org.imgscalr:imgscalr-lib:4.2'
         runtime 'org.apache.httpcomponents:httpcore:4.1.2'
         runtime 'org.apache.httpcomponents:httpclient:4.1.2'
         runtime 'org.apache.httpcomponents:httpcore:4.1.2'
         runtime 'org.apache.httpcomponents:httpclient:4.1.2'
         compile 'org.codehaus.gpars:gpars:0.11'
+        compile 'org.apache.activemq:activemq-core:5.3.0'
     }
 
     plugins {
-        //runtime ":hibernate:$grailsVersion"
         runtime ":jquery:1.7.1"
         runtime ":resources:1.1.6"
         compile ":mongodb:1.0.0.GA"
-        // Uncomment these (or add new ones) to enable additional resources capabilities
-        //runtime ":zipped-resources:1.0"
-        //runtime ":cached-resources:1.0"
-        //runtime ":yui-minify-resources:0.1.4"
-
         build ":tomcat:$grailsVersion"
     }
 }
