@@ -84,6 +84,7 @@ environments {
         fielddata.mediaUrl = "http://fielddata.ala.org.au/media/"
         fielddata.mediaDir = "/data/fielddata/media/"
         enableJMS = false //change to allow broadcast to queue
+        brokerURL = 'vm://ala-biocache1.vm.csiro.au'
     }
 }
 
