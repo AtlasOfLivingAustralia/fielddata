@@ -17,7 +17,7 @@ security.cas.logoutUrl = "https://auth.ala.org.au/cas/logout"
 ala.baseURL = "http://www.ala.org.au/"
 bie.baseURL = "http://bie.ala.org.au"
 bie.searchPath = "/search"
-brokerURL = 'vm://localhost'
+brokerURL = 'vm://ala-biocache1.vm.csiro.au'
 enableJMS = false
 
 grails.project.groupId = "au.org.ala.fielddata" // change this to alter the default package name and Maven publishing destination
