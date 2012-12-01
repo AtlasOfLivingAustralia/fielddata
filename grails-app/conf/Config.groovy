@@ -68,23 +68,23 @@ grails.exceptionresolver.params.exclude = ['password']
 // enable query caching by default
 grails.hibernate.cache.queries = true
 
-jms {
-    containers {
-        standard {
-            concurrentConsumers = 0
-            subscriptionDurable = false
-            autoStartup = false
-            connectionFactoryBean = "jmsConnectionFactory"
-            messageSelector = null
-            cacheLevel = DefaultMessageListenerContainer.CACHE_SESSION
-        }
-    }
-    adapters {
-        standard {
-            persistenceInterceptorBean = null
-        }
-    }
-}
+//jms {
+//    containers {
+//        standard {
+//            concurrentConsumers = 0
+//            subscriptionDurable = false
+//            autoStartup = false
+//            connectionFactoryBean = "jmsConnectionFactory"
+//            messageSelector = null
+//            cacheLevel = DefaultMessageListenerContainer.CACHE_SESSION
+//        }
+//    }
+//    adapters {
+//        standard {
+//            persistenceInterceptorBean = null
+//        }
+//    }
+//}
 
 // set per-environment serverURL stem for creating absolute links
 environments {

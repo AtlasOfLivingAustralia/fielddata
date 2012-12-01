@@ -1,7 +1,7 @@
 package au.org.ala.fielddata
 
 import grails.converters.JSON
-import grails.plugin.jms.*
+//import grails.plugin.jms.*
 
 class BroadcastService {
 
@@ -52,4 +52,9 @@ class BroadcastService {
         def map = [guid:recordID,messageMethod:"DELETE"]
 		sendJMSMessage("org.ala.jms.cs", (map as JSON).toString(true))
     }
+
+    def sendJMSMessage(queueName, message){
+        println "Doing nothing for now...."
+    }
+
 }
