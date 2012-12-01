@@ -66,9 +66,7 @@ class RecordController {
         [records:records]
     }
 
-    boolean isCollectionOrArray(object) {
-        [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
-    }
+
 
     def count(){
         response.setContentType("application/json")

@@ -9,12 +9,17 @@ class RecordService {
     def serviceMethod() {}
 
     def toMap(record){
-        def dbo = it.getProperty("dbo")
+        def dbo = record.getProperty("dbo")
         def mapOfProperties = dbo.toMap()
         def id = mapOfProperties["_id"].toString()
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
         setupMediaUrls(mapOfProperties)
+        mapOfProperties
+    }
+
+    boolean isCollectionOrArray(object) {
+        [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
     }
 
     def setupMediaUrls(mapOfProperties){

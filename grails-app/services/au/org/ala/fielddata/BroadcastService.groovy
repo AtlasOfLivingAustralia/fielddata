@@ -14,14 +14,15 @@ class BroadcastService {
     def resyncAll(){
         def max = 100
         def offset = 0
+        def synced = 0
         def finished = false
         while(!finished){
             def results = Record.list([offset:offset,max:max])
             finished = results.isEmpty()
-            results.each { sendUpdate(it) }
+            results.each { sendCreate(it); synced++ }
             offset += max
         }
-        offset
+        synced
     }
 
     def sendCreate(record){
