@@ -69,6 +69,16 @@ grails.exceptionresolver.params.exclude = ['password']
 grails.hibernate.cache.queries = true
 
 jms {
+    containers {
+        standard {
+            concurrentConsumers = 0
+            subscriptionDurable = false
+            autoStartup = false
+            connectionFactoryBean = "jmsConnectionFactory"
+            messageSelector = null
+            cacheLevel = DefaultMessageListenerContainer.CACHE_SESSION
+        }
+    }
     adapters {
         standard {
             persistenceInterceptorBean = null
