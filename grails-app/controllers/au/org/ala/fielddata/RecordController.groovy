@@ -168,6 +168,11 @@ class RecordController {
             def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
             r['associatedMedia'] = createdFile.getAbsolutePath()
         }
+
+        if(!r['occurrenceID']){
+            r['occurrenceID'] = r.id.toString()
+        }
+
         r.save(flush: true)
     }
 
