@@ -131,7 +131,7 @@ class RecordController {
             response.addHeader("entityId", r.id.toString())
             response.setContentType("application/json")
 
-            if(grailsApplication.config.enableJMS) broadcastService.sendCreate(r)
+            broadcastService.sendCreate(r)
 
             [id:r.id.toString()]
         } else {
@@ -207,14 +207,7 @@ class RecordController {
         response.addHeader("entityId", r.id.toString())
         response.setContentType("application/json")
 
-        if(grailsApplication.config.enableJMS) broadcastService.sendUpdate(r)
-
+        broadcastService.sendUpdate(r)
         [id:r.id.toString()]
     }
-
-//    def typeMapping = [
-//            "decimalLatitude" : "Float",
-//            "decimalLongitude" : "Float",
-//            "eventDate" : "Date",
-//    ]
 }

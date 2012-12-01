@@ -75,7 +75,7 @@ environments {
         grails.serverURL = "http://moyesyside.ala.org.au:8086"
         fielddata.mediaUrl = "http://moyesyside.ala.org.au/fielddata/"
         fielddata.mediaDir = "/data/fielddata/"
-        //enableJMS = false
+        enableJMS = false //change to allow broadcast to queue
     }
     production {
         grails.logging.jul.usebridge = false
@@ -83,7 +83,7 @@ environments {
         grails.serverURL = "http://fielddata.ala.org.au"
         fielddata.mediaUrl = "http://fielddata.ala.org.au/media/"
         fielddata.mediaDir = "/data/fielddata/media/"
-        enableJMS = true
+        enableJMS = false //change to allow broadcast to queue
     }
 }
 

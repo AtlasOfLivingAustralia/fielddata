@@ -5,6 +5,8 @@ import grails.plugin.jms.*
 
 class BroadcastService {
 
+    def grailsApplication
+
     def serviceMethod() {}
 
     def jmsService
@@ -12,6 +14,8 @@ class BroadcastService {
     def recordService
 
     def resyncAll(){
+        if(!grailsApplication.config.enableJMS) return 0
+
         def max = 100
         def offset = 0
         def synced = 0
@@ -26,6 +30,7 @@ class BroadcastService {
     }
 
     def sendCreate(record){
+        if(!grailsApplication.config.enableJMS) return;
         def mapOfProperties = recordService.toMap(record)
         mapOfProperties["messageMethod"] = "CREATE"
         def json = mapOfProperties as JSON
@@ -34,6 +39,7 @@ class BroadcastService {
     }
 
     def sendUpdate(record){
+        if(!grailsApplication.config.enableJMS) return;
         def mapOfProperties = recordService.toMap(record)
         mapOfProperties["messageMethod"] = "UPDATE"
         def json = mapOfProperties as JSON
@@ -42,6 +48,7 @@ class BroadcastService {
     }
 
     def sendDelete(recordID){
+        if(!grailsApplication.config.enableJMS) return;
         def map = [guid:recordID,messageMethod:"DELETE"]
 		sendJMSMessage("org.ala.jms.cs", (map as JSON).toString(true))
     }
