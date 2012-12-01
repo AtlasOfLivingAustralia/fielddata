@@ -48,7 +48,7 @@ class ImportService {
                             try {
                                 def suppliedDate = DateUtils.parseDate(column, dateFormats)
                                 SimpleDateFormat yyymmdd = new SimpleDateFormat("yyyy-MM-dd")
-                                SimpleDateFormat hhmm = new SimpleDateFormat("hh:mm")
+                                SimpleDateFormat hhmm = new SimpleDateFormat("HH:mm")
                                 r[columns[idx]] = yyymmdd.format(suppliedDate)
                                 r[columns["eventTime"]] = hhmm.format(suppliedDate)
                             } catch (Exception e) {}
