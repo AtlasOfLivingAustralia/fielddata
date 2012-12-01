@@ -11,29 +11,35 @@ class RecordController {
 
     def broadcastService
 
+    def recordService
+
     def ignores = ["action","controller","associatedMedia"]
 
-    def testJMS() {
-		def message = "Hi, this is a Hello World with JMS & ActiveMQ, " + new Date()
-		sendJMSMessage("queue.notification", message)
-		render message
+//    def testJMS() {
+//		def message = "Hi, this is a Hello World with JMS & ActiveMQ, " + new Date()
+//		sendJMSMessage("queue.notification", message)
+//		render message
+//    }
+
+    /*
+
+    addImages:[]
+    removeImages:[]
+
+     */
+
+    def updateImages(){
+
+
+
     }
+
 
     def getById(){
         Record r = Record.get(params.id)
         if(r){
-           // r.metaPropertyValues.each { println "meta: "  + it.name }
-            def dbo = r.getProperty("dbo")
-            def mapOfProperties = dbo.toMap()
-            def id = mapOfProperties["_id"].toString()
-            mapOfProperties["id"] = id
-            mapOfProperties.remove("_id")
-            if(mapOfProperties["eventDate"]){
-                mapOfProperties["eventDate"] = mapOfProperties["eventDate"].format("yyyy-MM-dd")
-            }
-            setupMediaUrls(mapOfProperties)
             response.setContentType("application/json")
-            [record:mapOfProperties]
+            [record:recordService.toMap(r)]
         } else {
             response.sendError(404, 'Unrecognised Record ID. This record may have been removed.')
         }
@@ -54,13 +60,7 @@ class RecordController {
             offset(offsetBy)
         }
         results.each {
-            def dbo = it.getProperty("dbo")
-            def mapOfProperties = dbo.toMap()
-            def id = mapOfProperties["_id"].toString()
-            mapOfProperties["id"] = id
-            mapOfProperties.remove("_id")
-            setupMediaUrls(mapOfProperties)
-            records.add(mapOfProperties)
+            records.add(recordService.toMap(it))
         }
         response.setContentType("application/json")
         [records:records]
@@ -68,45 +68,6 @@ class RecordController {
 
     boolean isCollectionOrArray(object) {
         [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
-    }
-
-    def setupMediaUrls(mapOfProperties){
-        if (mapOfProperties["associatedMedia"] != null){
-
-            if (isCollectionOrArray(mapOfProperties["associatedMedia"])){
-
-                def imagesArray = []
-
-                mapOfProperties["associatedMedia"].each {
-
-                    def imagePath = it.replaceAll(grailsApplication.config.fielddata.mediaDir,
-                            grailsApplication.config.fielddata.mediaUrl)
-                    def extension = FilenameUtils.getExtension(imagePath)
-                    def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
-                    def image = [
-                            thumb : pathWithoutExt + "__thumb."+extension,
-                            small : pathWithoutExt + "__small."+extension,
-                            large : pathWithoutExt + "__large."+extension,
-                            raw : imagePath,
-                    ]
-
-                    imagesArray.add(image)
-                }
-                mapOfProperties['images'] = imagesArray
-            } else {
-                def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
-                        grailsApplication.config.fielddata.mediaUrl)
-                def extension = FilenameUtils.getExtension(imagePath)
-                def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
-                def image = [
-                        thumb : pathWithoutExt + "__thumb."+extension,
-                        small : pathWithoutExt + "__small."+extension,
-                        large : pathWithoutExt + "__large."+extension,
-                        raw : imagePath,
-                ]
-                mapOfProperties['images'] = [image]
-            }
-        }
     }
 
     def count(){
@@ -122,14 +83,7 @@ class RecordController {
         def max = params.pageSize ?: 10
 
         Record.listOrderByDateCreated([sort:sort,order:order,offset:offset,max:max]).each {
-            def dbo = it.getProperty("dbo")
-            def mapOfProperties = dbo.toMap()
-            def id = mapOfProperties["_id"].toString()
-            mapOfProperties["id"] = id
-            //mapOfProperties["eventDate"] = it.eventDate?.format("yyyy-MM-dd")
-            mapOfProperties.remove("_id")
-            setupMediaUrls(mapOfProperties)
-            records.add(mapOfProperties)
+            records.add(recordService.toMap(it))
         }
         response.setContentType("application/json")
         [records:records]
@@ -144,13 +98,7 @@ class RecordController {
 
         log.debug("Retrieving a list for user:"  + params.userId)
         Record.findAllWhere([userId:params.userId], [sort:sort,order:order,offset:offset,max:max]).each {
-            def dbo = it.getProperty("dbo")
-            def mapOfProperties = dbo.toMap()
-            def id = mapOfProperties["_id"].toString()
-            mapOfProperties["id"] = id
-            mapOfProperties.remove("_id")
-            setupMediaUrls(mapOfProperties)
-            records.add(mapOfProperties)
+            records.add(recordService.toMap(it))
         }
         response.setContentType("application/json")
         [records:records]
@@ -173,9 +121,9 @@ class RecordController {
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
         if (json.userId){
-            if (json.eventDate){
-                json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
-            }
+//            if (json.eventDate){
+//                json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
+//            }
             Record r = new Record()
             r = r.save(true)
             updateRecord(r,json)
@@ -230,19 +178,25 @@ class RecordController {
         if (r) {
             broadcastService.sendUpdate(r)
             response.setStatus(200)
+            response.setContentType("application/json")
+            [recordSynced:true]
         } else {
             response.sendError(404)
         }
     }
 
     def resyncAll(){
-        response.sendError(400)
+        def count = broadcastService.resyncAll()
+        response.setContentType("application/json")
+        [recordsSynced:count]
     }
 
     def updateById(){
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
-        json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
+        //json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
+        //TODO add some data validation....
+
         Record r = Record.get(params.id)
         updateRecord(r,json)
         response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
@@ -255,9 +209,9 @@ class RecordController {
         [id:r.id.toString()]
     }
 
-    def typeMapping = [
-            "decimalLatitude" : "Float",
-            "decimalLongitude" : "Float",
-            "eventDate" : "Date",
-    ]
+//    def typeMapping = [
+//            "decimalLatitude" : "Float",
+//            "decimalLongitude" : "Float",
+//            "eventDate" : "Date",
+//    ]
 }

@@ -7,7 +7,8 @@ class Record {
     static mapping = { version false }
 
     ObjectId id
-    Date eventDate
+    String eventDate //should be a date in "yyyy-MM-dd" format
+    String eventTime //should be a date in "hh:mm" format
     String decimalLatitude
     String decimalLongitude
     String userId
@@ -16,6 +17,7 @@ class Record {
 
     static constraints = {
         eventDate nullable:true
+        eventTime nullable:true
         decimalLatitude nullable:true
         decimalLongitude nullable:true
         userId nullable: true
