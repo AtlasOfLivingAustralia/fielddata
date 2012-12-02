@@ -15,6 +15,17 @@ class MediaService {
 
     def serviceMethod() {}
 
+    def removeImage(filePath){
+        def thumb = getFileForFormat(filePath,THUMB)
+        def small = getFileForFormat(filePath,SMALL)
+        def large = getFileForFormat(filePath,LARGE)
+        def raw = new File(filePath)
+        if(thumb.exists()) FileUtils.forceDelete(thumb)
+        if(small.exists()) FileUtils.forceDelete(small)
+        if(large.exists()) FileUtils.forceDelete(large)
+        if(raw.exists()) FileUtils.forceDelete(raw)
+    }
+
     def File copyToImageDir(recordId,currentFilePath){
 
         File directory = new File(grailsApplication.config.fielddata.mediaDir + recordId)
@@ -60,6 +71,13 @@ class MediaService {
             generateThumbnail(source, SMALL)
             generateThumbnail(source, LARGE)
         }
+    }
+
+    File getFileForFormat(filePath, imageSize){
+        def source = new File(filePath)
+        def extension = FilenameUtils.getExtension(filePath)
+        def targetFilePath = source.getPath().replace("." + extension, imageSize.suffix + "." + extension)
+        new File(targetFilePath)
     }
 
     /** Generate an image of the specified size.*/

@@ -49,10 +49,7 @@ class RecordController {
                     )
                     mediaFiles.remove(createdFile.getAbsolutePath())
                     record['associatedMedia'] = mediaFiles
-                    def file = new File(imagePath)
-                    if(file.exists()){
-                        FileUtils.forceDelete(file) //delete the derivatives
-                    }
+                    mediaService.removeImage(imagePath) //delete original & the derivatives
                    }
                 }
                 record.save(true)
@@ -223,11 +220,7 @@ class RecordController {
             def filesToBeDeleted = originalFiles.findAll { !originalFilesSuppliedAgain.contains(it) }
            // println("Number to be deleted: " + filesToBeDeleted.size())
             filesToBeDeleted.each {
-              //  println("Deleting file: " + it)
-                File fileToBeDeleted = new File(it)
-                if(fileToBeDeleted.exists()){
-                    FileUtils.forceDelete(fileToBeDeleted) //TODO delete the derivatives
-                }
+                mediaService.removeImage(it) //delete original & the derivatives
                 mediaFiles.remove(it)
             }
 
