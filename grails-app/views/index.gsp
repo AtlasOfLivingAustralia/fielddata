@@ -119,6 +119,17 @@
                         <li>pageSize - Page size to use. default is 30</li>
                     </ul>
                 </li>
+                <li>
+                    <strong>Update the images for a record</strong>
+                    - HTTP POST on the URL <a href="images">/images/update</a>. Example JSON body below:
+                    <p class="code">
+                        {
+                        "id":"3243243243",
+                        "addImages":["http://...../myNewImage.jpg", "http://...../myNewImage2.jpg"],
+                        "removeImages":["http://...../myUnwantedImage.jpg", "http://...../myUnwantedImage2.jpg"],
+                        }
+                    </p>
+                </li>
              </ul>
 
             <h3>Bookmarked locations</h3>

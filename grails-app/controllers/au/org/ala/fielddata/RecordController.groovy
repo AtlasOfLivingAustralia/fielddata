@@ -215,7 +215,7 @@ class RecordController {
                 } else {
                    // println("URL NOT loaded. Downloading file: " + obj)
                     def createdFile = mediaService.download(r.id.toString(), i, obj)
-                    mediaFiles << createdFile.getAbsolutePath()
+                    mediaFiles << createdFile.getPath()
                 }
             }
 
@@ -234,7 +234,7 @@ class RecordController {
             r['associatedMedia'] = mediaFiles
         } else if(json.associatedMedia) {
             def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
-            r['associatedMedia'] = createdFile.getAbsolutePath()
+            r['associatedMedia'] = createdFile.getPath()
         }
 
         if(!r['occurrenceID']){
