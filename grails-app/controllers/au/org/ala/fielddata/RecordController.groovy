@@ -203,7 +203,7 @@ class RecordController {
                 if (obj.startsWith(grailsApplication.config.fielddata.mediaUrl)){
                     //URL already loaded - do nothing
                   //  println("URL already loaded: " + obj)
-                    def imagePath = grailsApplication.config.fielddata.mediaUrl + (it - grailsApplication.config.fielddata.mediaDir)
+                    def imagePath = grailsApplication.config.fielddata.mediaDir + (obj - grailsApplication.config.fielddata.mediaUrl)
                    // println("URL already loaded - transformed image path: " + imagePath)
                     originalFilesSuppliedAgain <<  imagePath
                 } else {
