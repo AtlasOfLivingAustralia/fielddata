@@ -2,6 +2,8 @@ package au.org.ala.fielddata
 
 import groovy.json.JsonSlurper
 import org.apache.commons.io.FilenameUtils
+import org.bson.types.ObjectId
+import org.apache.commons.io.FileUtils
 
 class RecordController {
 
@@ -15,25 +17,54 @@ class RecordController {
 
     def ignores = ["action","controller","associatedMedia"]
 
-//    def testJMS() {
-//		def message = "Hi, this is a Hello World with JMS & ActiveMQ, " + new Date()
-//		sendJMSMessage("queue.notification", message)
-//		render message
-//    }
-
-    /*
-
-    addImages:[]
-    removeImages:[]
-
+    /**
+     * JSON body looks like:
+     *        {
+     *          "id":"34234324324"
+     *          "addImages":[....]   //array of urls to new images
+     *          "removeImages":[...]  //array of urls to existing images
+     *        }
      */
-
     def updateImages(){
-
-
-
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parse(request.getReader())
+        if (json.id){
+            def record = Record.findById(new ObjectId(json.id))
+            if (record){
+                if(json.addImages){
+                   json.addImages.each {
+                    def mediaFiles = record['associatedMedia']
+                    def createdFile = mediaService.download(record.id.toString(), mediaFiles.length-1, obj)
+                    mediaFiles.add createdFile.getAbsolutePath()
+                    record['associatedMedia'] = mediaFiles
+                   }
+                }
+                if (json.removeImages){
+                   json.removeImages.each {
+                    def mediaFiles = record['associatedMedia']
+                    //translate the full URL to actual path
+                    def imagePath = it.replaceAll(
+                            grailsApplication.config.fielddata.mediaUrl,
+                            grailsApplication.config.fielddata.mediaDir
+                    )
+                    mediaFiles.remove(createdFile.getAbsolutePath())
+                    record['associatedMedia'] = mediaFiles
+                    def file = new File(imagePath)
+                    if(file.exists()){
+                        FileUtils.forceDelete(file) //delete the derivatives
+                    }
+                   }
+                }
+                record.save(true)
+                response.setContentType("application/json")
+                [id: record.id.toString(), images:record['associatedMedia']]
+            } else {
+                response.sendError(404, 'Record ID not recognised. JSON payload must contain "id" element for existing record.')
+            }
+        } else {
+            response.sendError(400, 'No record ID was supplied. JSON payload must contain "id" element.')
+        }
     }
-
 
     def getById(){
         Record r = Record.get(params.id)
@@ -144,9 +175,9 @@ class RecordController {
         json.each {
             if(!ignores.contains(it.key) && it.value){
                 if (it.value && it.value instanceof BigDecimal ){
-                    println "Before: " + it.value
+                    //println "Before: " + it.value
                     r[it.key] = it.value.toString()
-                    println "After: " + r[it.key]
+                    //println "After: " + r[it.key]
                 } else {
                     r[it.key] = it.value
                 }
@@ -157,10 +188,47 @@ class RecordController {
         if (List.isCase(json.associatedMedia)){
 
             def mediaFiles = []
+            def originalFiles = []
+            if (r['associatedMedia']) {
+                r['associatedMedia'].each {
+                    mediaFiles << it
+                    originalFiles << it
+                }
+            }
+
+            if(!originalFiles) originalFiles = []
+
+            def originalFilesSuppliedAgain = []
 
             json.associatedMedia.eachWithIndex() { obj, i ->
-                def createdFile = mediaService.download(r.id.toString(), i, obj)
-                mediaFiles.add createdFile.getAbsolutePath()
+                //are any of these images existing images ?
+                //println "Processing associated media URL : " + obj
+                if (obj.startsWith(grailsApplication.config.fielddata.mediaUrl)){
+                    //URL already loaded - do nothing
+                  //  println("URL already loaded: " + obj)
+                    def imagePath = obj.replaceAll(
+                            grailsApplication.config.fielddata.mediaUrl,
+                            grailsApplication.config.fielddata.mediaDir
+                    )
+                   // println("URL already loaded - transformed image path: " + imagePath)
+                    originalFilesSuppliedAgain <<  imagePath
+                } else {
+                   // println("URL NOT loaded. Downloading file: " + obj)
+                    def createdFile = mediaService.download(r.id.toString(), i, obj)
+                    mediaFiles << createdFile.getAbsolutePath()
+                }
+            }
+
+            //do we need to delete any files ?
+            def filesToBeDeleted = originalFiles.findAll { !originalFilesSuppliedAgain.contains(it) }
+           // println("Number to be deleted: " + filesToBeDeleted.size())
+            filesToBeDeleted.each {
+              //  println("Deleting file: " + it)
+                File fileToBeDeleted = new File(it)
+                if(fileToBeDeleted.exists()){
+                    FileUtils.forceDelete(fileToBeDeleted) //TODO delete the derivatives
+                }
+                mediaFiles.remove(it)
             }
 
             r['associatedMedia'] = mediaFiles
@@ -197,6 +265,9 @@ class RecordController {
     def updateById(){
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
+
+        //println("JSON: " + json.toString())
+
         //json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
         //TODO add some data validation....
 
