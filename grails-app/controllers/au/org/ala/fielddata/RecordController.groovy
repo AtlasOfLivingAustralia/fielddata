@@ -1,9 +1,7 @@
 package au.org.ala.fielddata
 
 import groovy.json.JsonSlurper
-import org.apache.commons.io.FilenameUtils
 import org.bson.types.ObjectId
-import org.apache.commons.io.FileUtils
 
 class RecordController {
 
@@ -19,11 +17,11 @@ class RecordController {
 
     /**
      * JSON body looks like:
-     *        {
-     *          "id":"34234324324"
-     *          "addImages":[....]   //array of urls to new images
-     *          "removeImages":[...]  //array of urls to existing images
-     *        }
+     * {
+     *  "id":"34234324324"
+     *  "addImages":[....]   //array of urls to new images
+     *  "removeImages":[...]  //array of urls to existing images
+     * }
      */
     def updateImages(){
         def jsonSlurper = new JsonSlurper()
@@ -94,8 +92,6 @@ class RecordController {
         [records:records]
     }
 
-
-
     def count(){
         response.setContentType("application/json")
         [count:Record.count()]
@@ -109,6 +105,8 @@ class RecordController {
         def max = params.pageSize ?: 10
 
         Record.listOrderByDateCreated([sort:sort,order:order,offset:offset,max:max]).each {
+            recordService.toMap(it)
+
             records.add(recordService.toMap(it))
         }
         response.setContentType("application/json")
@@ -134,6 +132,9 @@ class RecordController {
         Record r = Record.get(params.id)
         if (r){
             r.delete(flush: true)
+            if(r['associatedMedia']){
+               r['associatedMedia'].each { mediaService.removeImage(it)}
+            }
             response.setStatus(200)
         } else {
             response.sendError(400)
@@ -147,20 +148,13 @@ class RecordController {
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
         if (json.userId){
-//            if (json.eventDate){
-//                json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
-//            }
             Record r = new Record()
             r = r.save(true)
             updateRecord(r,json)
             //download the supplied images......
-            response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
-            response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
-            response.addHeader("entityId", r.id.toString())
+            setResponseHeadersForRecord(response, r)
             response.setContentType("application/json")
-
             broadcastService.sendCreate(r)
-
             [id:r.id.toString()]
         } else {
             response.sendError(400, 'Missing userId')
@@ -255,20 +249,19 @@ class RecordController {
     def updateById(){
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
-
-        //println("JSON: " + json.toString())
-
         //json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
         //TODO add some data validation....
-
         Record r = Record.get(params.id)
         updateRecord(r,json)
-        response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
-        response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + r.id.toString())
-        response.addHeader("entityId", r.id.toString())
+        setResponseHeadersForRecord(response, r)
         response.setContentType("application/json")
-
         broadcastService.sendUpdate(r)
         [id:r.id.toString()]
+    }
+
+    def setResponseHeadersForRecord(response, record){
+        response.addHeader("content-location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + record.id.toString())
+        response.addHeader("location", grailsApplication.config.grails.serverURL + "/fielddata/record/" + record.id.toString())
+        response.addHeader("entityId", record.id.toString())
     }
 }

@@ -17,8 +17,9 @@ security.cas.logoutUrl = "https://auth.ala.org.au/cas/logout"
 ala.baseURL = "http://www.ala.org.au/"
 bie.baseURL = "http://bie.ala.org.au"
 bie.searchPath = "/search"
-brokerURL = 'vm://ala-biocache1.vm.csiro.au'
+brokerURL = 'tcp://localhost:61616'
 enableJMS = false
+userDetails.url ="http://auth.ala.org.au/userdetails/userDetails/getUserListWithIds"
 
 grails.project.groupId = "au.org.ala.fielddata" // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
@@ -68,24 +69,6 @@ grails.exceptionresolver.params.exclude = ['password']
 // enable query caching by default
 grails.hibernate.cache.queries = true
 
-//jms {
-//    containers {
-//        standard {
-//            concurrentConsumers = 0
-//            subscriptionDurable = false
-//            autoStartup = false
-//            connectionFactoryBean = "jmsConnectionFactory"
-//            messageSelector = null
-//            cacheLevel = DefaultMessageListenerContainer.CACHE_SESSION
-//        }
-//    }
-//    adapters {
-//        standard {
-//            persistenceInterceptorBean = null
-//        }
-//    }
-//}
-
 // set per-environment serverURL stem for creating absolute links
 environments {
     development {
@@ -94,6 +77,8 @@ environments {
         fielddata.mediaUrl = "http://moyesyside.ala.org.au/fielddata/"
         fielddata.mediaDir = "/data/fielddata/"
         enableJMS = false //change to allow broadcast to queue
+        brokerURL = 'tcp://localhost:61616'
+        queueName = "org.ala.jms.cs"
     }
     production {
         grails.logging.jul.usebridge = false
@@ -102,7 +87,8 @@ environments {
         fielddata.mediaUrl = "http://fielddata.ala.org.au/media/"
         fielddata.mediaDir = "/data/fielddata/media/"
         enableJMS = false //change to allow broadcast to queue
-        brokerURL = 'vm://ala-biocache1.vm.csiro.au'
+        brokerURL = 'tcp://ala-biocache1.vm.csiro.au:61616'
+        queueName = "org.ala.jms.cstest"
     }
 }
 
@@ -119,7 +105,7 @@ log4j = {
 
         environments {
             production {
-              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/var/log/tomcat6/fielddata.log", threshold: org.apache.log4j.Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}] %m%n")
+              rollingFile name: "tomcatLog", maxFileSize: 102400000, file: "/var/log/tomcat6/fielddata.log", threshold: org.apache.log4j.Level.INFO, layout: pattern(conversionPattern: "%d %-5p [%c{1}] %m%n")
               'null' name: "stacktrace"
             }
             development {

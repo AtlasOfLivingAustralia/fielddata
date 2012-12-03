@@ -1,6 +1,8 @@
 package au.org.ala.fielddata
 
 import org.apache.commons.io.FilenameUtils
+import org.springframework.cache.annotation.Cacheable
+import org.apache.commons.lang.time.DateUtils
 
 class RecordService {
 
@@ -8,12 +10,26 @@ class RecordService {
 
     def serviceMethod() {}
 
+    def webService
+
+    def userListMap = [:]
+
+    def lastRefresh
+
     def toMap(record){
         def dbo = record.getProperty("dbo")
         def mapOfProperties = dbo.toMap()
         def id = mapOfProperties["_id"].toString()
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
+        //add userDisplayName - Cacheable not working....
+        if(mapOfProperties["userId"]){
+            def userMap = getUserNamesForIdsMap()
+            def userDisplayName = userMap.get(mapOfProperties["userId"])
+            if(userDisplayName){
+                 mapOfProperties["userDisplayName"] = userDisplayName
+            }
+        }
         setupMediaUrls(mapOfProperties)
         mapOfProperties
     }
@@ -59,5 +75,29 @@ class RecordService {
                 mapOfProperties['images'] = [image]
             }
         }
+    }
+
+    def getUserNamesForIdsMap() {
+        def now = new Date()
+        if(!lastRefresh ||  DateUtils.addMinutes(lastRefresh, 10) < now){
+            try {
+                def replacementMap = [:]
+
+                def userListJson = webService.doPost(grailsApplication.config.userDetails.url)
+                println "Refreshing user lists....."
+                if (!userListJson.error) {
+                    userListJson.resp.keySet().each {
+                        replacementMap.put(it.toString(),  userListJson.resp[it]);
+                    }
+                } else {
+                    log.info "error -  " + userListJson.getClass() + ":"+ userListJson
+                }
+                this.userListMap = replacementMap
+                lastRefresh = now
+            } catch (Exception e) {
+                log.error "Cache refresh error" + e.message
+            }
+        }
+        this.userListMap
     }
 }

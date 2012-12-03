@@ -1,8 +1,30 @@
 // Place your Spring DSL code here
 beans = {
 
-//    //comment this out for local development
-//    jmsConnectionFactory(org.apache.activemq.ActiveMQConnectionFactory) {
-//	    brokerURL = grailsApplication.config.brokerURL
+//    userCache(org.springframework.cache.ehcache.EhCacheFactoryBean) { bean ->
+//        cacheManager = ref("springcacheCacheManager")
+//        eternal = true
+//        diskPersistent = false
+//        cacheName = "userCache"
 //    }
+
+    //comment this out for local development
+    amqConnectionFactory(org.apache.activemq.ActiveMQConnectionFactory) {
+        println("Initialing connection factory with brokerURL : " + grailsApplication.config.brokerURL)
+	    brokerURL = grailsApplication.config.brokerURL
+    }
+
+    jmsConnectionFactory(org.springframework.jms.connection.CachingConnectionFactory){
+       targetConnectionFactory = amqConnectionFactory
+       sessionCacheSize="10"
+    }
+
+    destination(org.apache.activemq.command.ActiveMQQueue){
+        physicalName = grailsApplication.config.queueName
+    }
+
+    jmsTemplate(org.springframework.jms.core.JmsTemplate){
+        connectionFactory = jmsConnectionFactory
+        defaultDestination = destination
+    }
 }

@@ -10,7 +10,7 @@ grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
         // uncomment to disable ehcache
-        // excludes 'ehcache'
+        //excludes 'ehcache'
     }
     log "error" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     checksums true // Whether to verify checksums on resolve
@@ -40,6 +40,7 @@ grails.project.dependency.resolution = {
         runtime 'org.apache.httpcomponents:httpclient:4.1.2'
         compile 'org.codehaus.gpars:gpars:0.11'
         compile 'org.apache.activemq:activemq-core:5.3.0'
+        compile 'com.googlecode.ehcache-spring-annotations:ehcache-spring-annotations:1.2.0'
     }
 
     plugins {
