@@ -39,8 +39,8 @@ grails.project.dependency.resolution = {
         runtime 'org.apache.httpcomponents:httpcore:4.1.2'
         runtime 'org.apache.httpcomponents:httpclient:4.1.2'
         compile 'org.codehaus.gpars:gpars:0.11'
-        compile 'org.apache.activemq:activemq-core:5.3.0'
-        compile 'com.googlecode.ehcache-spring-annotations:ehcache-spring-annotations:1.2.0'
+        //compile 'org.apache.activemq:activemq-core:5.3.0'
+        //compile 'com.googlecode.ehcache-spring-annotations:ehcache-spring-annotations:1.2.0'
     }
 
     plugins {
