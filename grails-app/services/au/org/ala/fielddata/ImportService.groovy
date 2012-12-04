@@ -20,7 +20,6 @@ class ImportService {
         def indexOfOccurrenceID = -1
         def associatedMediaIdx = -1
 
-
         new File(filePath).eachCsvLine {
             count += 1
             //println "Starting....." + count
@@ -51,8 +50,12 @@ class ImportService {
                     if(column && column.trim() != "" && columns[idx] != "associatedMedia" && columns[idx] != "eventTime") {
                         if(columns[idx] == "createdDate" && column){
                            try {
-                            r.dateCreated = DateUtils.parseDate("yyyy-MM-dd HH:mm:ss.SSS", column)
-                           } catch (Exception e) {}
+                                //2012-02-15 17:20:00.0
+                                r.dateCreated = DateUtils.parseDate(column,["yyyy-MM-dd HH:mm:ss.SSS"].toArray(new String[0]))
+                                r.lastUpdated = DateUtils.parseDate(column,["yyyy-MM-dd HH:mm:ss.SSS"].toArray(new String[0]))
+                           } catch (Exception e) {
+                               println("Problem parsing:" + column)
+                           }
                         } else if(columns[idx] == "eventDate" && column){
                             try {
                                 def suppliedDate = DateUtils.parseDate(column, dateFormats)
