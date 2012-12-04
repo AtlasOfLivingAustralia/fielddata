@@ -86,6 +86,10 @@
                     - HTTP DELETE with URL of the form /record/&lt;ID&gt;
                 </li>
                 <li>
+                    <strong>Record count</strong>
+                    - HTTP GET with URL <a href="record/count">/record/count</a>
+                </li>
+                <li>
                     <strong>List records</strong>
                     - HTTP GET on the URL <a href="record">/record</a>
                     <ul class="paramsList">
