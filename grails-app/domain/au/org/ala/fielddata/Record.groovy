@@ -8,7 +8,7 @@ class Record {
 
     ObjectId id
     String eventDate //should be a date in "yyyy-MM-dd" format
-    String eventTime //should be a date in "hh:mm" format
+    String eventTime //should be a date in "HH:mm" format
     String decimalLatitude
     String decimalLongitude
     String userId
