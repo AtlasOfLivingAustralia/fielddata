@@ -49,7 +49,11 @@ class ImportService {
                 it.eachWithIndex { column, idx ->
                     log.trace("Field debug : " + columns[idx] + " : " + column)
                     if(column && column.trim() != "" && columns[idx] != "associatedMedia" && columns[idx] != "eventTime") {
-                        if(columns[idx] == "eventDate" && column){
+                        if(columns[idx] == "createdDate" && column){
+                           try {
+                            r.dateCreated = DateUtils.parseDate("yyyy-MM-dd HH:mm:ss.SSS", column)
+                           } catch (Exception e) {}
+                        } else if(columns[idx] == "eventDate" && column){
                             try {
                                 def suppliedDate = DateUtils.parseDate(column, dateFormats)
                                 SimpleDateFormat yyymmdd = new SimpleDateFormat("yyyy-MM-dd")
