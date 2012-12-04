@@ -15,6 +15,13 @@ class RecordController {
 
     def ignores = ["action","controller","associatedMedia"]
 
+    def updateCommonNames(){
+        def url = "http://bie.ala.org.au/ws/species/bulklookup.json"
+
+
+
+    }
+
     /**
      * JSON body looks like:
      * {
@@ -82,7 +89,7 @@ class RecordController {
         def results = c.list {
             isNotNull("associatedMedia")
             maxResults(max)
-            //order(sort,orderBy)
+            order(sort,orderBy)
             offset(offsetBy)
         }
         results.each {
@@ -103,10 +110,8 @@ class RecordController {
         def order = params.order ?:  "desc"
         def offset = params.start ?: 0
         def max = params.pageSize ?: 10
-
-        Record.listOrderByDateCreated([sort:sort,order:order,offset:offset,max:max]).each {
+        Record.list([sort:sort,order:order,offset:offset,max:max]).each {
             recordService.toMap(it)
-
             records.add(recordService.toMap(it))
         }
         response.setContentType("application/json")
@@ -135,6 +140,7 @@ class RecordController {
             if(r['associatedMedia']){
                r['associatedMedia'].each { mediaService.removeImage(it)}
             }
+            broadcastService.sendDelete(r["occurrenceID"])
             response.setStatus(200)
         } else {
             response.sendError(400)

@@ -23,4 +23,5 @@ class ImportController {
        response.setContentType("application/json")
        [started:true]
     }
+
 }

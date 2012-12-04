@@ -76,7 +76,7 @@ environments {
         grails.serverURL = "http://moyesyside.ala.org.au:8086"
         fielddata.mediaUrl = "http://moyesyside.ala.org.au/fielddata/"
         fielddata.mediaDir = "/data/fielddata/"
-        enableJMS = false //change to allow broadcast to queue
+        enableJMS = true //change to allow broadcast to queue
         brokerURL = 'tcp://localhost:61616'
         queueName = "org.ala.jms.cs"
     }

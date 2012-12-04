@@ -44,6 +44,7 @@ class RecordService {
             if (isCollectionOrArray(mapOfProperties["associatedMedia"])){
 
                 def imagesArray = []
+                def originalsArray = []
 
                 mapOfProperties["associatedMedia"].each {
 
@@ -57,9 +58,10 @@ class RecordService {
                             large : pathWithoutExt + "__large."+extension,
                             raw : imagePath,
                     ]
-
-                    imagesArray.add(image)
+                    originalsArray << imagePath
+                    imagesArray << image
                 }
+                mapOfProperties['associatedMedia'] = originalsArray
                 mapOfProperties['images'] = imagesArray
             } else {
                 def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
@@ -72,6 +74,7 @@ class RecordService {
                         large : pathWithoutExt + "__large."+extension,
                         raw : imagePath,
                 ]
+                mapOfProperties['associatedMedia'] = [imagePath]
                 mapOfProperties['images'] = [image]
             }
         }
@@ -84,8 +87,8 @@ class RecordService {
                 def replacementMap = [:]
 
                 def userListJson = webService.doPost(grailsApplication.config.userDetails.url)
-                println "Refreshing user lists....."
-                if (!userListJson.error) {
+                log.info "Refreshing user lists....."
+                if (userListJson && !userListJson.error) {
                     userListJson.resp.keySet().each {
                         replacementMap.put(it.toString(),  userListJson.resp[it]);
                     }

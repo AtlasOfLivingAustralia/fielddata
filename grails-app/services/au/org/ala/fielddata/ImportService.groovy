@@ -2,6 +2,7 @@ package au.org.ala.fielddata
 
 import org.apache.commons.lang.time.DateUtils
 import java.text.SimpleDateFormat
+import org.apache.commons.lang.StringUtils
 
 class ImportService {
 
@@ -22,7 +23,7 @@ class ImportService {
 
         new File(filePath).eachCsvLine {
             count += 1
-            println "Starting....." + count
+            //println "Starting....." + count
             if(count == 1){
                 columns = it
                 columns.eachWithIndex { obj, i ->
@@ -46,8 +47,8 @@ class ImportService {
                 }
 
                 it.eachWithIndex { column, idx ->
-                    println("Field debug : " + columns[idx] + " : " + column)
-                    if(column != null && column != "" && column != "associatedMedia" && column != "eventTime") {
+                    log.debug("Field debug : " + columns[idx] + " : " + column)
+                    if(column && column.trim() != "" && columns[idx] != "associatedMedia" && columns[idx] != "eventTime") {
                         if(columns[idx] == "eventDate" && column){
                             try {
                                 def suppliedDate = DateUtils.parseDate(column, dateFormats)
@@ -55,16 +56,18 @@ class ImportService {
                                 SimpleDateFormat hhmm = new SimpleDateFormat("HH:mm")
                                 r[columns[idx]] = yyymmdd.format(suppliedDate)
                                 def eventTimeFormatted = hhmm.format(suppliedDate)
-                                println eventTimeFormatted
-                                r[columns["eventTime"]] = eventTimeFormatted
-                            } catch (Exception e) {
-                                e.printStackTrace()
+                                r.eventTime = eventTimeFormatted
+                            } catch (Exception e) {}
+                        } else if(columns[idx] == "decimalLatitude"){
+                            if(column && column != "null"){
+                                r[columns[idx]] = Float.parseFloat(column)
                             }
-                        } else if(columns[idx] == "decimalLatitude" && column && column != "null"){
-                            r[columns[idx]] = Float.parseFloat(column)
-                        } else if(columns[idx] == "decimalLongitude" && column && column != "null"){
-                            r[columns[idx]] = Float.parseFloat(column)
+                        } else if(columns[idx] == "decimalLongitude"){
+                            if(column && column != "null"){
+                                r[columns[idx]] = Float.parseFloat(column)
+                            }
                         } else {
+                           // println "Setting: " + columns[idx]
                             r[columns[idx]] = column
                         }
                     }
@@ -76,9 +79,6 @@ class ImportService {
 
                 if(!preloaded){
                     if(associatedMediaIdx>=0 && it[associatedMediaIdx]){
-                        if(it[associatedMediaIdx].endsWith("C:fakepathIMG_20120208_154135.jpg")){
-                            println "bad image: " + it[associatedMediaIdx]
-                        }
                         try {
                             def mediaFile = mediaService.copyToImageDir(r.id.toString(), it[associatedMediaIdx])
                             println "Media filepath: " + mediaFile.getPath()
@@ -89,9 +89,8 @@ class ImportService {
                                 println "Unable to import media for path: " +  it[associatedMediaIdx]
                             }
                         } catch(Exception e){
-                            e.printStackTrace()
-                            println("Error loading images.")
-                            r['associatedMedia'] = "[]"
+                            println("Error loading images: " + it[associatedMediaIdx])
+                            r['associatedMedia'] = null
                             r.save(flush:true)
                         }
                     }
