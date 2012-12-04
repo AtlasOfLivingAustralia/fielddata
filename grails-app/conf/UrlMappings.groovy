@@ -10,8 +10,9 @@ class UrlMappings {
         "/record/sync/all"(controller: "record"){ action = [GET:"resyncAll"] }
         "/record/sync/$id"(controller: "record"){ action = [GET:"resyncRecord"] }
         "/record/$id"(controller: "record"){ action = [GET:"getById", PUT:"updateById", DELETE:"deleteById", POST:"updateById"] }
-        "/images/update"(controller: "record"){ action = [POST:"updateImages"] }
+        "/images"(controller: "record"){ action = [GET:"listRecordWithImages"] }
         "/images/"(controller: "record"){ action = [GET:"listRecordWithImages"] }
+        "/images/update"(controller: "record"){ action = [POST:"updateImages"] }
         "/location"(controller: "location"){ action = [GET:"list", POST:"create"] }
         "/location/"(controller: "location"){ action = [GET:"list", POST:"create"] }
         "/location/user/$userId"(controller: "location"){ action = [GET:"listForUser", DELETE: "deleteAllForUser"] }

@@ -47,7 +47,7 @@ class ImportService {
                 }
 
                 it.eachWithIndex { column, idx ->
-                    log.debug("Field debug : " + columns[idx] + " : " + column)
+                    log.trace("Field debug : " + columns[idx] + " : " + column)
                     if(column && column.trim() != "" && columns[idx] != "associatedMedia" && columns[idx] != "eventTime") {
                         if(columns[idx] == "eventDate" && column){
                             try {
