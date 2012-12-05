@@ -11,6 +11,7 @@ import org.apache.commons.lang.time.DateUtils
 import grails.converters.JSON
 import org.apache.http.HttpResponse
 import org.apache.commons.codec.binary.Base64
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class MobileController {
 
