@@ -14,13 +14,13 @@ class RecordController {
     def recordService
 
     def ignores = ["action","controller","associatedMedia"]
-
-    def updateCommonNames(){
-        def url = "http://bie.ala.org.au/ws/species/bulklookup.json"
-
-
-
-    }
+//
+//    def updateCommonNames(){
+//        def url = "http://bie.ala.org.au/ws/species/bulklookup.json"
+//
+//
+//
+//    }
 
     /**
      * JSON body looks like:
@@ -154,84 +154,13 @@ class RecordController {
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
         if (json.userId){
-            Record r = new Record()
-            r = r.save(true)
-            updateRecord(r,json)
-            //download the supplied images......
-            setResponseHeadersForRecord(response, r)
+            def record = recordService.createRecord(json)
+            setResponseHeadersForRecord(response, record)
             response.setContentType("application/json")
-            broadcastService.sendCreate(r)
-            [id:r.id.toString()]
+            [id:record.id.toString()]
         } else {
             response.sendError(400, 'Missing userId')
         }
-    }
-
-    private def updateRecord(r, json){
-
-        json.each {
-            if(!ignores.contains(it.key) && it.value){
-                if (it.value && it.value instanceof BigDecimal ){
-                    //println "Before: " + it.value
-                    r[it.key] = it.value.toString()
-                    //println "After: " + r[it.key]
-                } else {
-                    r[it.key] = it.value
-                }
-            }
-        }
-
-        //look for associated media.....
-        if (List.isCase(json.associatedMedia)){
-
-            def mediaFiles = []
-            def originalFiles = []
-            if (r['associatedMedia']) {
-                r['associatedMedia'].each {
-                    mediaFiles << it
-                    originalFiles << it
-                }
-            }
-
-            if(!originalFiles) originalFiles = []
-
-            def originalFilesSuppliedAgain = []
-
-            json.associatedMedia.eachWithIndex() { obj, i ->
-                //are any of these images existing images ?
-                //println "Processing associated media URL : " + obj
-                if (obj.startsWith(grailsApplication.config.fielddata.mediaUrl)){
-                    //URL already loaded - do nothing
-                  //  println("URL already loaded: " + obj)
-                    def imagePath = grailsApplication.config.fielddata.mediaDir + (obj - grailsApplication.config.fielddata.mediaUrl)
-                   // println("URL already loaded - transformed image path: " + imagePath)
-                    originalFilesSuppliedAgain <<  imagePath
-                } else {
-                   // println("URL NOT loaded. Downloading file: " + obj)
-                    def createdFile = mediaService.download(r.id.toString(), i, obj)
-                    mediaFiles << createdFile.getPath()
-                }
-            }
-
-            //do we need to delete any files ?
-            def filesToBeDeleted = originalFiles.findAll { !originalFilesSuppliedAgain.contains(it) }
-           // println("Number to be deleted: " + filesToBeDeleted.size())
-            filesToBeDeleted.each {
-                mediaService.removeImage(it) //delete original & the derivatives
-                mediaFiles.remove(it)
-            }
-
-            r['associatedMedia'] = mediaFiles
-        } else if(json.associatedMedia) {
-            def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
-            r['associatedMedia'] = createdFile.getPath()
-        }
-
-        if(!r['occurrenceID']){
-            r['occurrenceID'] = r.id.toString()
-        }
-
-        r.save(flush: true)
     }
 
     def resyncRecord(){
@@ -258,7 +187,7 @@ class RecordController {
         //json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
         //TODO add some data validation....
         Record r = Record.get(params.id)
-        updateRecord(r,json)
+        recordService.updateRecord(r,json)
         setResponseHeadersForRecord(response, r)
         response.setContentType("application/json")
         broadcastService.sendUpdate(r)

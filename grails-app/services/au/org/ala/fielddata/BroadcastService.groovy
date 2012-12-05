@@ -13,7 +13,7 @@ class BroadcastService {
 
     def grailsApplication
 
-    def recordService
+    def mediaService
 
     def jmsTemplate
 
@@ -46,8 +46,7 @@ class BroadcastService {
 
     def sendCreate(record){
         if(grailsApplication.config.enableJMS){
-            def mapOfProperties = recordService.toMap(record)
-            mapOfProperties.remove("images")
+            def mapOfProperties = toMap(record)
             def json = mapOfProperties as JSON
             log.debug("sending create: " + json.toString(true))
             sendMessage("CREATE", json.toString(true))
@@ -58,8 +57,8 @@ class BroadcastService {
 
     def sendUpdate(record){
         if(grailsApplication.config.enableJMS){
-            def mapOfProperties = recordService.toMap(record)
-            mapOfProperties.remove("images")
+            def mapOfProperties = toMap(record)
+
             def json = mapOfProperties as JSON
             println("sending update: " + json.toString(true))
             sendMessage("UPDATE", json.toString(true))
@@ -75,5 +74,16 @@ class BroadcastService {
         } else {
             log.debug "JMS currently disabled....not sending DELETE"
         }
+    }
+
+    def toMap(record){
+        def dbo = record.getProperty("dbo")
+        def mapOfProperties = dbo.toMap()
+        def id = mapOfProperties["_id"].toString()
+        mapOfProperties["id"] = id
+        mapOfProperties.remove("_id")
+        mapOfProperties.remove("images")
+        mediaService.setupMediaUrls(mapOfProperties)
+        mapOfProperties
     }
 }

@@ -3,6 +3,7 @@ package au.org.ala.fielddata
 import org.apache.commons.io.FilenameUtils
 import org.springframework.cache.annotation.Cacheable
 import org.apache.commons.lang.time.DateUtils
+import org.apache.commons.codec.binary.Base64
 
 class RecordService {
 
@@ -12,9 +13,99 @@ class RecordService {
 
     def webService
 
-    def userListMap = [:]
+    def ignores = ["action","controller","associatedMedia"]
 
-    def lastRefresh
+    def mediaService
+
+    def broadcastService
+
+    def userService
+
+    def createRecord(json){
+        Record r = new Record()
+        r = r.save(true)
+        updateRecord(r,json)
+        //download the supplied images......
+        broadcastService.sendCreate(r)
+        r
+    }
+
+    def addImageToRecord(Record record, String filename, byte[] imageAsByteArray){
+        File createdFile = mediaService.copyBytesToImageDir(record.id.toString(), filename, imageAsByteArray)
+        if(record['associatedMedia']){
+            record['associatedMedia'] << createdFile.getPath()
+        } else {
+            record['associatedMedia'] = createdFile.getPath()
+        }
+        record.save(true)
+    }
+
+    def updateRecord(r, json){
+
+        json.each {
+            if(!ignores.contains(it.key) && it.value){
+                if (it.value && it.value instanceof BigDecimal ){
+                    //println "Before: " + it.value
+                    r[it.key] = it.value.toString()
+                    //println "After: " + r[it.key]
+                } else {
+                    r[it.key] = it.value
+                }
+            }
+        }
+
+        //look for associated media.....
+        if (List.isCase(json.associatedMedia)){
+
+            def mediaFiles = []
+            def originalFiles = []
+            if (r['associatedMedia']) {
+                r['associatedMedia'].each {
+                    mediaFiles << it
+                    originalFiles << it
+                }
+            }
+
+            if(!originalFiles) originalFiles = []
+
+            def originalFilesSuppliedAgain = []
+
+            json.associatedMedia.eachWithIndex() { obj, i ->
+                //are any of these images existing images ?
+                //println "Processing associated media URL : " + obj
+                if (obj.startsWith(grailsApplication.config.fielddata.mediaUrl)){
+                    //URL already loaded - do nothing
+                  //  println("URL already loaded: " + obj)
+                    def imagePath = grailsApplication.config.fielddata.mediaDir + (obj - grailsApplication.config.fielddata.mediaUrl)
+                   // println("URL already loaded - transformed image path: " + imagePath)
+                    originalFilesSuppliedAgain <<  imagePath
+                } else {
+                   // println("URL NOT loaded. Downloading file: " + obj)
+                    def createdFile = mediaService.download(r.id.toString(), i, obj)
+                    mediaFiles << createdFile.getPath()
+                }
+            }
+
+            //do we need to delete any files ?
+            def filesToBeDeleted = originalFiles.findAll { !originalFilesSuppliedAgain.contains(it) }
+           // println("Number to be deleted: " + filesToBeDeleted.size())
+            filesToBeDeleted.each {
+                mediaService.removeImage(it) //delete original & the derivatives
+                mediaFiles.remove(it)
+            }
+
+            r['associatedMedia'] = mediaFiles
+        } else if(json.associatedMedia) {
+            def createdFile = mediaService.download(r.id.toString(), 0, json.associatedMedia)
+            r['associatedMedia'] = createdFile.getPath()
+        }
+
+        if(!r['occurrenceID']){
+            r['occurrenceID'] = r.id.toString()
+        }
+
+        r.save(flush: true)
+    }
 
     def toMap(record){
         def dbo = record.getProperty("dbo")
@@ -24,83 +115,13 @@ class RecordService {
         mapOfProperties.remove("_id")
         //add userDisplayName - Cacheable not working....
         if(mapOfProperties["userId"]){
-            def userMap = getUserNamesForIdsMap()
+            def userMap = userService.getUserNamesForIdsMap()
             def userDisplayName = userMap.get(mapOfProperties["userId"])
             if(userDisplayName){
                  mapOfProperties["userDisplayName"] = userDisplayName
             }
         }
-        setupMediaUrls(mapOfProperties)
+        mediaService.setupMediaUrls(mapOfProperties)
         mapOfProperties
-    }
-
-    boolean isCollectionOrArray(object) {
-        [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
-    }
-
-    def setupMediaUrls(mapOfProperties){
-        if (mapOfProperties["associatedMedia"] != null){
-
-            if (isCollectionOrArray(mapOfProperties["associatedMedia"])){
-
-                def imagesArray = []
-                def originalsArray = []
-
-                mapOfProperties["associatedMedia"].each {
-
-                    def imagePath = it.replaceAll(grailsApplication.config.fielddata.mediaDir,
-                            grailsApplication.config.fielddata.mediaUrl)
-                    def extension = FilenameUtils.getExtension(imagePath)
-                    def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
-                    def image = [
-                            thumb : pathWithoutExt + "__thumb."+extension,
-                            small : pathWithoutExt + "__small."+extension,
-                            large : pathWithoutExt + "__large."+extension,
-                            raw : imagePath,
-                    ]
-                    originalsArray << imagePath
-                    imagesArray << image
-                }
-                mapOfProperties['associatedMedia'] = originalsArray
-                mapOfProperties['images'] = imagesArray
-            } else {
-                def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
-                        grailsApplication.config.fielddata.mediaUrl)
-                def extension = FilenameUtils.getExtension(imagePath)
-                def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
-                def image = [
-                        thumb : pathWithoutExt + "__thumb."+extension,
-                        small : pathWithoutExt + "__small."+extension,
-                        large : pathWithoutExt + "__large."+extension,
-                        raw : imagePath,
-                ]
-                mapOfProperties['associatedMedia'] = [imagePath]
-                mapOfProperties['images'] = [image]
-            }
-        }
-    }
-
-    def getUserNamesForIdsMap() {
-        def now = new Date()
-        if(!lastRefresh ||  DateUtils.addMinutes(lastRefresh, 10) < now){
-            try {
-                def replacementMap = [:]
-
-                def userListJson = webService.doPost(grailsApplication.config.userDetails.url)
-                log.info "Refreshing user lists....."
-                if (userListJson && !userListJson.error) {
-                    userListJson.resp.keySet().each {
-                        replacementMap.put(it.toString(),  userListJson.resp[it]);
-                    }
-                } else {
-                    log.info "error -  " + userListJson.getClass() + ":"+ userListJson
-                }
-                this.userListMap = replacementMap
-                lastRefresh = now
-            } catch (Exception e) {
-                log.error "Cache refresh error" + e.message
-            }
-        }
-        this.userListMap
     }
 }

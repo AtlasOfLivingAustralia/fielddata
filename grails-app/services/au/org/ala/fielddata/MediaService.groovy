@@ -26,6 +26,68 @@ class MediaService {
         if(raw.exists()) FileUtils.forceDelete(raw)
     }
 
+    def setupMediaUrls(mapOfProperties){
+        if (mapOfProperties["associatedMedia"] != null){
+
+            if (isCollectionOrArray(mapOfProperties["associatedMedia"])){
+
+                def imagesArray = []
+                def originalsArray = []
+
+                mapOfProperties["associatedMedia"].each {
+
+                    def imagePath = it.replaceAll(grailsApplication.config.fielddata.mediaDir,
+                            grailsApplication.config.fielddata.mediaUrl)
+                    def extension = FilenameUtils.getExtension(imagePath)
+                    def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
+                    def image = [
+                            thumb : pathWithoutExt + "__thumb."+extension,
+                            small : pathWithoutExt + "__small."+extension,
+                            large : pathWithoutExt + "__large."+extension,
+                            raw : imagePath,
+                    ]
+                    originalsArray << imagePath
+                    imagesArray << image
+                }
+                mapOfProperties['associatedMedia'] = originalsArray
+                mapOfProperties['images'] = imagesArray
+            } else {
+                def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
+                        grailsApplication.config.fielddata.mediaUrl)
+                def extension = FilenameUtils.getExtension(imagePath)
+                def pathWithoutExt = imagePath.substring(0, imagePath.length() - extension.length() - 1 )
+                def image = [
+                        thumb : pathWithoutExt + "__thumb."+extension,
+                        small : pathWithoutExt + "__small."+extension,
+                        large : pathWithoutExt + "__large."+extension,
+                        raw : imagePath,
+                ]
+                mapOfProperties['associatedMedia'] = [imagePath]
+                mapOfProperties['images'] = [image]
+            }
+        }
+    }
+
+    def File copyBytesToImageDir(recordId, fileNameWithExtension, theBytes){
+        File directory = new File(grailsApplication.config.fielddata.mediaDir + recordId)
+        if(!directory.exists()){
+            FileUtils.forceMkdir(directory)
+        }
+        File destFile = new File(grailsApplication.config.fielddata.mediaDir + recordId + File.separator + fileNameWithExtension.replaceAll(" ", "_"))
+        try {
+            FileUtils.writeByteArrayToFile(destFile, theBytes)
+            //generate thumbnail, small, large
+            generateAllSizes(destFile)
+            destFile
+        } catch (Exception e){
+            log.info "Unable to create file: "  + fileNameWithExtension + " for record " + recordId
+            //clean up afterwards
+            if(directory.listFiles().length == 0){
+                FileUtils.forceDelete(directory)
+            }
+            null
+        }
+    }
     def File copyToImageDir(recordId,currentFilePath){
 
         File directory = new File(grailsApplication.config.fielddata.mediaDir + recordId)
@@ -92,5 +154,9 @@ class MediaService {
     def generateThumbnail(source, target, thumbnailSize){
         def t = new ThumbnailableImage(source)
         t.writeThumbnailToFile(target, thumbnailSize)
+    }
+
+    boolean isCollectionOrArray(object) {
+        [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
     }
 }
