@@ -14,14 +14,6 @@ class RecordController {
     def recordService
 
     def ignores = ["action","controller","associatedMedia"]
-//
-//    def updateCommonNames(){
-//        def url = "http://bie.ala.org.au/ws/species/bulklookup.json"
-//
-//
-//
-//    }
-
     /**
      * JSON body looks like:
      * {
@@ -142,6 +134,8 @@ class RecordController {
             }
             broadcastService.sendDelete(r["occurrenceID"])
             response.setStatus(200)
+            response.setContentType("application/json")
+            [success:true]
         } else {
             response.sendError(400)
         }
