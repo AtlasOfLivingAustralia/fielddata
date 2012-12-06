@@ -3,6 +3,9 @@ class UrlMappings {
 	static mappings = {
 
         //"/record/testJMS"(controller: "record"){ action = [GET:"testJMS"] }
+        "/mobile/submitRecord"(controller: "mobile"){ action = [POST:"submitRecord"] }
+        "/mobile/submitRecordMultipart"(controller: "mobile"){ action = [POST:"submitRecordMultipart"] }
+        "/record/"(controller: "record"){ action = [GET:"list", POST:"create"] }
         "/record"(controller: "record"){ action = [GET:"list", POST:"create"] }
         "/record/"(controller: "record"){ action = [GET:"list", POST:"create"] }
         "/record/count"(controller: "record"){ action = [GET:"count"] }
@@ -19,9 +22,7 @@ class UrlMappings {
         "/location/"(controller: "location"){ action = [GET:"list", POST:"create"] }
         "/location/user/$userId"(controller: "location"){ action = [GET:"listForUser", DELETE: "deleteAllForUser"] }
         "/location/$id"(controller: "location"){ action = [GET:"getById", PUT:"updateById", DELETE:"deleteById", POST:"updateById"] }
-
         "/media/$dir/$fileName"(controller: "media"){ action = [GET:"getImage"] }
-
 
         "/$controller/$action?/$id?"{
 			constraints {

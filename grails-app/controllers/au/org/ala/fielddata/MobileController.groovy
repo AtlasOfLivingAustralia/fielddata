@@ -22,39 +22,50 @@ class MobileController {
     def userService
 
     def submitRecordMultipart(){
-        log.info("Mobile - submitRecordMultipart POST received...")
-        def recordParams = constructRecordParams(request, params)
-        Record record = recordService.createRecord(recordParams)
-        //handle the multipart message.....
-        if(request instanceof MultipartHttpServletRequest){
-            Map<String, MultipartFile> fileMap = request.getFileMap()
-            if (fileMap.containsKey("attribute_file_1")) {
-                MultipartFile multipartFile = fileMap.get("attribute_file_1")
-                byte[] imageAsBytes = multipartFile.getBytes()
-                String originalName = multipartFile.getOriginalFilename()
-                recordService.addImageToRecord(record, originalName, imageAsBytes)
+        println("Mobile - submitRecordMultipart POST received...")
+        try {
+            def recordParams = constructRecordParams(request, params)
+            Record record = recordService.createRecord(recordParams)
+            //handle the multipart message.....
+            if(request instanceof MultipartHttpServletRequest){
+                Map<String, MultipartFile> fileMap = request.getFileMap()
+                if (fileMap.containsKey("attribute_file_1")) {
+                    MultipartFile multipartFile = fileMap.get("attribute_file_1")
+                    byte[] imageAsBytes = multipartFile.getBytes()
+                    String originalName = multipartFile.getOriginalFilename()
+                    recordService.addImageToRecord(record, originalName, imageAsBytes)
+                }
             }
+            println "Added record: " + record.id.toString()
+            response.setStatus(200)
+            response.setContentType("application/json")
+            [success:true, recordId:record.id.toString()]
+        } catch (Exception e){
+            response.setStatus(500)
+            response.setContentType("application/json")
+            [success:false]
         }
-        log.debug "Added record: " + record.id.toString()
-        response.setStatus(200)
-        response.setContentType("application/json")
-        [success:true, recordId:record.id.toString()]
-
     }
 
     def submitRecord(){
-        log.info("Mobile - submitRecord POST received...")
-        def recordParams = constructRecordParams(request, params)
-        Record record = recordService.createRecord(recordParams)
-        //handle the base64 encoded image if supplied.....
-        if(params.imageBase64 && params.imageFileName){
-            byte[] imageAsBytes = Base64.decodeBase64(params.imageBase64)
-            recordService.addImageToRecord(record, params.imageFileName, imageAsBytes)
+        println("Mobile - submitRecord POST received...")
+        try {
+            def recordParams = constructRecordParams(request, params)
+            Record record = recordService.createRecord(recordParams)
+            //handle the base64 encoded image if supplied.....
+            if(params.imageBase64 && params.imageFileName){
+                byte[] imageAsBytes = Base64.decodeBase64(params.imageBase64)
+                recordService.addImageToRecord(record, params.imageFileName, imageAsBytes)
+            }
+            println "submitRecord POST - added record: " + record.id.toString()
+            response.setStatus(200)
+            response.setContentType("application/json")
+            [success:true, recordId:record.id.toString()]
+        } catch (Exception e){
+            response.setStatus(500)
+            response.setContentType("application/json")
+            [success:false]
         }
-        log.info "submitRecord POST - added record: " + record.id.toString()
-        response.setStatus(200)
-        response.setContentType("application/json")
-        [success:true, recordId:record.id.toString()]
     }
 
     private def boolean checkAuthenticationKey(String userName, String authenticationKey) throws Exception {
