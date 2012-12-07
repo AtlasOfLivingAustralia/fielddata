@@ -10,7 +10,7 @@ class ImportService {
 
     def serviceMethod() {}
 
-    def loadFile(filePath){
+    def loadFile(filePath, reloadImages){
         def columns = []
         println "Starting import of data....."
         String[] dateFormats = ["yyyy-MM-dd HH:mm:ss.s"]
@@ -83,7 +83,7 @@ class ImportService {
                 imported ++
                 log.info("Importing record: " + r.id + ", count: " + count + ", imported: " + imported + ", skipped: " + (count-imported))
 
-                if(!preloaded){
+                if(!preloaded || reloadImages){
                     if(associatedMediaIdx>=0 && it[associatedMediaIdx]){
                         try {
                             def mediaFile = mediaService.copyToImageDir(r.id.toString(), it[associatedMediaIdx])
