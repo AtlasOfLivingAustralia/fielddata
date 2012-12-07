@@ -16,8 +16,7 @@ class ImportController {
        def reloadImages = params.reloadImages
 
        def theActor = actor {
-            println "Starting a thread.....reload images: " + params.reloadImages
-
+            println "Starting a thread.....reload images: " + reloadImages
             importService.loadFile(filePath, reloadImages)
             println "Finishing thread."
        }
