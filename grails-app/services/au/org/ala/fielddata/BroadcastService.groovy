@@ -17,6 +17,8 @@ class BroadcastService {
 
     def jmsTemplate
 
+    def userService
+
     def destination
 
     def sendMessage(method, json){
@@ -83,6 +85,13 @@ class BroadcastService {
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
         mapOfProperties.remove("images")
+        if(mapOfProperties["userId"]){
+            def userMap = userService.getUserNamesForIdsMap()
+            def userDisplayName = userMap.get(mapOfProperties["userId"])
+            if(userDisplayName){
+                 mapOfProperties["recordedBy"] = userDisplayName
+            }
+        }
         mediaService.setupMediaUrls(mapOfProperties)
         mapOfProperties
     }
