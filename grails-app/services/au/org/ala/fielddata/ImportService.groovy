@@ -74,7 +74,6 @@ class ImportService {
                                 r[columns[idx]] = Float.parseFloat(column)
                             }
                         } else {
-                           // println "Setting: " + columns[idx]
                             r[columns[idx]] = column
                         }
                     }

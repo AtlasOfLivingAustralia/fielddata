@@ -3,6 +3,8 @@ class UrlMappings {
 	static mappings = {
 
         //"/record/testJMS"(controller: "record"){ action = [GET:"testJMS"] }
+        "/submit/record"(controller: "mobile"){ action = [POST:"submitRecord"] }
+        "/submit/recordMultiPart"(controller: "mobile"){ action = [POST:"submitRecordMultipart"] }
         "/mobile/submitRecord"(controller: "mobile"){ action = [POST:"submitRecord"] }
         "/mobile/submitRecordMultipart"(controller: "mobile"){ action = [POST:"submitRecordMultipart"] }
         "/record/"(controller: "record"){ action = [GET:"list", POST:"create"] }

@@ -25,12 +25,13 @@ class UserService {
                 log.info "Refreshing user lists....."
                 if (userListJson && !userListJson.error) {
                     userListJson.resp.each {
-                        println("Adding: " + it.email +" -> " + it.id)
+                       // println("Adding: " + it.email +" -> " + it.id)
                         replacementMap.put(it.email.toLowerCase(),  it.id);
                     }
                 } else {
                     log.info "error -  " + userListJson.getClass() + ":"+ userListJson
                 }
+                log.info "Refreshing user lists.....count: " + replacementMap.size()
                 this.userEmailMap = replacementMap
                 lastRefresh = now
             } catch (Exception e) {
@@ -55,6 +56,7 @@ class UserService {
                 } else {
                     log.info "error -  " + userListJson.getClass() + ":"+ userListJson
                 }
+                log.info "Refreshing user lists.....count: " + replacementMap.size()
                 this.userListMap = replacementMap
                 lastRefresh = now
             } catch (Exception e) {
