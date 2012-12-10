@@ -129,8 +129,12 @@ class RecordController {
         Record r = Record.get(params.id)
         if (r){
             r.delete(flush: true)
-            if(r['associatedMedia']){
-               r['associatedMedia'].each { mediaService.removeImage(it)}
+            if(r['associatedMedia'] && r['associatedMedia']){
+//               r['associatedMedia'].each {
+//                   if(it && it.startsWith(grailsApplication.config.fielddata.mediaDir)){
+//                    mediaService.removeImage(it)
+//                   }
+//               }
             }
             broadcastService.sendDelete(r["occurrenceID"])
             response.setStatus(200)
