@@ -90,7 +90,8 @@ class RecordService {
             def filesToBeDeleted = originalFiles.findAll { !originalFilesSuppliedAgain.contains(it) }
            // println("Number to be deleted: " + filesToBeDeleted.size())
             filesToBeDeleted.each {
-                mediaService.removeImage(it) //delete original & the derivatives
+              //  mediaService.removeImage(it) //delete original & the derivatives
+                log.info("Removing :" + it)
                 mediaFiles.remove(it)
             }
 

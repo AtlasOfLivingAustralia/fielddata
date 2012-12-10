@@ -44,7 +44,7 @@ class RecordController {
                             grailsApplication.config.fielddata.mediaUrl,
                             grailsApplication.config.fielddata.mediaDir
                     )
-                    mediaFiles.remove(createdFile.getAbsolutePath())
+                    mediaFiles.remove(createdFile.getPath())
                     record['associatedMedia'] = mediaFiles
                     mediaService.removeImage(imagePath) //delete original & the derivatives
                    }
