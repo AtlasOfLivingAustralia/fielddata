@@ -50,31 +50,31 @@ class BroadcastService {
         if(grailsApplication.config.enableJMS){
             def mapOfProperties = toMap(record)
             def json = mapOfProperties as JSON
-            log.debug("sending create: " + json.toString(true))
+            log.info("sending create: " + record["id"])
             sendMessage("CREATE", json.toString(true))
         } else {
-             log.debug "JMS currently disabled....not sending CREATE"
+            log.info "JMS currently disabled....not sending CREATE"
         }
     }
 
     def sendUpdate(record){
         if(grailsApplication.config.enableJMS){
             def mapOfProperties = toMap(record)
-
             def json = mapOfProperties as JSON
-            log.debug("sending update: " + json.toString(true))
+            log.info("sending update: " + record["id"])
             sendMessage("UPDATE", json.toString(true))
         } else {
-            log.debug "JMS currently disabled....not sending UPDATE"
+            log.info "JMS currently disabled....not sending UPDATE"
         }
     }
 
     def sendDelete(occurrenceID){
         if(grailsApplication.config.enableJMS){
             def map = [occurrenceID:occurrenceID]
+            log.debug("sending delete: " + occurrenceID)
             sendMessage("DELETE", (map as JSON).toString(true))
         } else {
-            log.debug "JMS currently disabled....not sending DELETE"
+            log.info "JMS currently disabled....not sending DELETE"
         }
     }
 

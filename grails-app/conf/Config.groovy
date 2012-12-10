@@ -151,9 +151,6 @@ log4j = {
            'net',
            'grails.util.GrailsUtil'
 
-    debug  'grails.app.domain.ala.postie',
-           'grails.app.controller.ala.postie',
-           'grails.app.service.ala.postie',
-           'grails.app.tagLib.ala.postie'
+    info  'au.org.ala.fielddata.BroadcastService'
 }
 
