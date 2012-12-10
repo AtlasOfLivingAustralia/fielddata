@@ -84,7 +84,6 @@ class BroadcastService {
         def id = mapOfProperties["_id"].toString()
         mapOfProperties["id"] = id
         mapOfProperties.remove("_id")
-        mapOfProperties.remove("images")
         if(mapOfProperties["userId"]){
             def userMap = userService.getUserNamesForIdsMap()
             def userDisplayName = userMap.get(mapOfProperties["userId"])
@@ -92,7 +91,7 @@ class BroadcastService {
                  mapOfProperties["recordedBy"] = userDisplayName
             }
         }
-        mediaService.setupMediaUrls(mapOfProperties)
+        mediaService.setupMediaUrlsForAssociatedMedia(mapOfProperties)
         mapOfProperties
     }
 }

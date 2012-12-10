@@ -68,6 +68,26 @@ class MediaService {
         }
     }
 
+    def setupMediaUrlsForAssociatedMedia(mapOfProperties){
+        if (mapOfProperties["associatedMedia"] != null){
+
+            if (isCollectionOrArray(mapOfProperties["associatedMedia"])){
+                def originalsArray = []
+                mapOfProperties["associatedMedia"].each {
+                    def imagePath = it.replaceAll(grailsApplication.config.fielddata.mediaDir,
+                            grailsApplication.config.fielddata.mediaUrl)
+                    originalsArray << imagePath
+                }
+                mapOfProperties['associatedMedia'] = originalsArray
+            } else {
+                def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
+                        grailsApplication.config.fielddata.mediaUrl)
+                mapOfProperties['associatedMedia'] = [imagePath]
+                mapOfProperties['images'] = [image]
+            }
+        }
+    }
+
     def File copyBytesToImageDir(recordId, fileNameWithExtension, theBytes){
         File directory = new File(grailsApplication.config.fielddata.mediaDir + recordId)
         if(!directory.exists()){
