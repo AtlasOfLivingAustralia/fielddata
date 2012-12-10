@@ -41,7 +41,7 @@ class BroadcastService {
             def results = Record.list([offset:offset,max:max])
             finished = results.isEmpty()
             results.each { sendCreate(it); synced++ }
-            offset += max
+            offset += results.size()
         }
         synced
     }
@@ -62,7 +62,7 @@ class BroadcastService {
             def mapOfProperties = toMap(record)
 
             def json = mapOfProperties as JSON
-            println("sending update: " + json.toString(true))
+            log.debug("sending update: " + json.toString(true))
             sendMessage("UPDATE", json.toString(true))
         } else {
             log.debug "JMS currently disabled....not sending UPDATE"

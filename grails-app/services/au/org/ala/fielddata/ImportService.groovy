@@ -13,7 +13,7 @@ class ImportService {
     def loadFile(filePath, reloadImages){
         def columns = []
         println "Starting import of data....."
-        String[] dateFormats = ["yyyy-MM-dd HH:mm:ss.s"]
+        String[] dateFormats = ["yyyy-MM-dd HH:mm:ss.s", "dd/MM/yyyy"]
 
         def count = 0
         def imported = 0
