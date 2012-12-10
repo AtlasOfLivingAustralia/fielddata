@@ -20,10 +20,10 @@ class MediaService {
         def small = getFileForFormat(filePath,SMALL)
         def large = getFileForFormat(filePath,LARGE)
         def raw = new File(filePath)
-        if(thumb.exists()) FileUtils.forceDelete(thumb)
-        if(small.exists()) FileUtils.forceDelete(small)
-        if(large.exists()) FileUtils.forceDelete(large)
-        if(raw.exists()) FileUtils.forceDelete(raw)
+        if(thumb.exists()) thumb.delete() //FileUtils.forceDelete(thumb)
+        if(small.exists()) small.delete() //FileUtils.forceDelete(small)
+        if(large.exists()) large.delete() //FileUtils.forceDelete(large)
+        if(raw.exists()) raw.delete() //FileUtils.forceDelete(raw)
     }
 
     def setupMediaUrls(mapOfProperties){
@@ -150,7 +150,7 @@ class MediaService {
         generateThumbnail(source, target, imageSize.size)
     }
 
-    /** Generate a thumbanail to the specified file */
+    /** Generate a thumbnail to the specified file */
     def generateThumbnail(source, target, thumbnailSize){
         def t = new ThumbnailableImage(source)
         t.writeThumbnailToFile(target, thumbnailSize)
