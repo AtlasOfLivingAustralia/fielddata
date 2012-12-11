@@ -97,6 +97,7 @@ class RecordController {
     }
 
     def list(){
+        log.debug("list request....")
         def records = []
         def sort = params.sort ?: "dateCreated"
         def order = params.order ?:  "desc"
@@ -111,6 +112,7 @@ class RecordController {
     }
 
     def listForUser(){
+        log.debug("list request for user...." + params.userId)
         def records = []
         def sort = params.sort ?: "dateCreated"
         def order = params.order ?:  "desc"

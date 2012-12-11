@@ -10,7 +10,7 @@ beans = {
 
     //comment this out for local development
     amqConnectionFactory(org.apache.activemq.ActiveMQConnectionFactory) {
-        println("[JMS]Initialising connection factory with brokerURL : " + grailsApplication.config.brokerURL)
+        println("[JMS] Initialising connection factory with brokerURL : " + grailsApplication.config.brokerURL)
 	    brokerURL = grailsApplication.config.brokerURL
     }
 
