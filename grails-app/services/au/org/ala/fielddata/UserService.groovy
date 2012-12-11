@@ -14,55 +14,35 @@ class UserService {
 
     private def userEmailMap = [:]
 
-    private def lastRefresh
+    def refreshUserDetails(){
+        try {
+            def replacementEmailMap = [:]
+            def replacementIdMap = [:]
+            def userListJson = webService.doPost(grailsApplication.config.userDetailsUrl)
+            log.info "Refreshing user lists....."
+            if (userListJson && !userListJson.error) {
+                userListJson.resp.each {
+                    replacementEmailMap.put(it.email.toLowerCase(),  it.id);
+                    replacementIdMap.put(it.id, it.email.toLowerCase());
+                }
+                log.info "Refreshing user lists.....count: " + replacementEmailMap.size()
+                synchronized (this){
+                    this.userEmailMap = replacementEmailMap
+                    this.userListMap = replacementIdMap
+                }
+            } else {
+                log.info "error -  " + userListJson.getClass() + ":"+ userListJson
+            }
+        } catch (Exception e) {
+            log.error "Cache refresh error" + e.message
+        }
+    }
 
     def getUserEmailToIdMap() {
-        def now = new Date()
-        if(!lastRefresh ||  DateUtils.addMinutes(lastRefresh, 10) < now){
-            try {
-                def replacementMap = [:]
-                def userListJson = webService.doPost(grailsApplication.config.userDetails.emails.url)
-                log.info "Refreshing user lists....."
-                if (userListJson && !userListJson.error) {
-                    userListJson.resp.each {
-                       // println("Adding: " + it.email +" -> " + it.id)
-                        replacementMap.put(it.email.toLowerCase(),  it.id);
-                    }
-                } else {
-                    log.info "error -  " + userListJson.getClass() + ":"+ userListJson
-                }
-                log.info "Refreshing user lists.....count: " + replacementMap.size()
-                this.userEmailMap = replacementMap
-                lastRefresh = now
-            } catch (Exception e) {
-                log.error "Cache refresh error" + e.message
-            }
-        }
         this.userEmailMap
     }
 
     def getUserNamesForIdsMap() {
-        def now = new Date()
-        if(!lastRefresh ||  DateUtils.addMinutes(lastRefresh, 10) < now){
-            try {
-                def replacementMap = [:]
-
-                def userListJson = webService.doPost(grailsApplication.config.userDetails.url)
-                log.info "Refreshing user lists....."
-                if (userListJson && !userListJson.error) {
-                    userListJson.resp.keySet().each {
-                        replacementMap.put(it.toString(),  userListJson.resp[it]);
-                    }
-                } else {
-                    log.info "error -  " + userListJson.getClass() + ":"+ userListJson
-                }
-                log.info "Refreshing user lists.....count: " + replacementMap.size()
-                this.userListMap = replacementMap
-                lastRefresh = now
-            } catch (Exception e) {
-                log.error "Cache refresh error" + e.message
-            }
-        }
         this.userListMap
     }
 }

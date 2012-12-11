@@ -19,8 +19,7 @@ bie.baseURL = "http://bie.ala.org.au"
 bie.searchPath = "/search"
 brokerURL = 'tcp://localhost:61616'
 enableJMS = false
-userDetails.url ="http://auth.ala.org.au/userdetails/userDetails/getUserListWithIds"
-userDetails.emails.url = "http://auth.ala.org.au/userdetails/userDetails/getUserListFull"
+userDetailsUrl = "http://auth.ala.org.au/userdetails/userDetails/getUserListFull"
 
 grails.project.groupId = "au.org.ala.fielddata" // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format

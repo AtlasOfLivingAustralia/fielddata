@@ -13,7 +13,7 @@ class RecordService {
 
     def webService
 
-    def ignores = ["action","controller","associatedMedia"]
+    final def ignores = ["action","controller","associatedMedia"]
 
     def mediaService
 
