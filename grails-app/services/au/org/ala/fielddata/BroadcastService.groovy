@@ -1,6 +1,8 @@
 package au.org.ala.fielddata
 
 import grails.converters.JSON
+import org.springframework.jms.core.JmsTemplate
+
 import javax.jms.TextMessage
 import javax.jms.JMSException
 import javax.jms.Session
@@ -15,7 +17,7 @@ class BroadcastService {
 
     def mediaService
 
-    def jmsTemplate
+    JmsTemplate jmsTemplate
 
     def userService
 
@@ -26,7 +28,7 @@ class BroadcastService {
             Message createMessage(Session session) throws JMSException {
                 TextMessage message = session.createTextMessage(json)
                 message.setStringProperty("messageMethod", method)
-                return message;
+                return message
             }
         })
     }

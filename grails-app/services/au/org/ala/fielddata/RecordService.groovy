@@ -11,8 +11,6 @@ class RecordService {
 
     def serviceMethod() {}
 
-    def webService
-
     final def ignores = ["action","controller","associatedMedia"]
 
     def mediaService
@@ -87,12 +85,11 @@ class RecordService {
             }
 
             //do we need to delete any files ?
-            def filesToBeDeleted = originalFiles.findAll { !originalFilesSuppliedAgain.contains(it) }
-           // println("Number to be deleted: " + filesToBeDeleted.size())
-            filesToBeDeleted.each {
-              //  mediaService.removeImage(it) //delete original & the derivatives
-                log.info("Removing :" + it)
-                mediaFiles.remove(it)
+            originalFiles.each {
+                if(!originalFilesSuppliedAgain.contains(it)){
+                    log.info("Removing :" + it)
+                    mediaFiles.remove(it)
+                }
             }
 
             r['associatedMedia'] = mediaFiles
@@ -117,7 +114,8 @@ class RecordService {
         //add userDisplayName - Cacheable not working....
         if(mapOfProperties["userId"]){
             def userMap = userService.getUserNamesForIdsMap()
-            def userDisplayName = userMap.get(mapOfProperties["userId"])
+            def userId = mapOfProperties["userId"]
+            def userDisplayName = userMap.get(userId)
             if(userDisplayName){
                  mapOfProperties["userDisplayName"] = userDisplayName
             }
