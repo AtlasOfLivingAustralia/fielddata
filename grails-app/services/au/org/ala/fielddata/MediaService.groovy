@@ -165,7 +165,11 @@ class MediaService {
     /** Generate an image of the specified size.*/
     def generateThumbnail(source, imageSize){
         def extension = FilenameUtils.getExtension(source.getPath())
-        def targetFilePath = source.getPath().replace("." + extension, imageSize.suffix + "." + extension)
+        //def targetFilePath = source.getPath().replace("." + extension, imageSize.suffix + "." + extension)
+        def sourcePath = source.getPath()
+        def oldExtension = extension.length()
+
+        def targetFilePath = sourcePath.substring(0, sourcePath.length() - (extension.length() + 1)) + imageSize.suffix + "." + extension
         def target = new File(targetFilePath)
         generateThumbnail(source, target, imageSize.size)
     }

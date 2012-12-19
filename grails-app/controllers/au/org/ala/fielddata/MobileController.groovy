@@ -87,16 +87,19 @@ class MobileController {
                     response.setContentType("application/json")
                     [success:true, recordId:record.id.toString()]
                 } else {
+                    log.error("Unable to create record. " + recordParams.error)
                     response.setContentType("application/json")
                     response.sendError(400, recordParams.error)
                     [success:false]
                 }
             } catch (Exception e){
+                log.error(e.getMessage(),e)
                 response.setStatus(500)
                 response.setContentType("application/json")
                 [success:false]
             }
         } else {
+            log.info("AUTHENTICATION FAILED: Mobile userName:" + params.userName + ", authKey:" +params.authenticationKey)
             response.setStatus(403)
             response.setContentType("application/json")
             [success:false]
