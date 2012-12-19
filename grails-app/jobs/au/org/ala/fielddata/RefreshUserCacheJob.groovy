@@ -5,7 +5,7 @@ package au.org.ala.fielddata
 class RefreshUserCacheJob {
 
   static triggers = {
-     cron name:'hourly', startDelay:10000, cronExpression: '0 */5 * * * ?'
+     cron name:'refreshUserCache', startDelay:10000, cronExpression: '0 */5 * * * ?'
   }
 
   def userService

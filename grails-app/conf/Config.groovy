@@ -72,7 +72,7 @@ grails.hibernate.cache.queries = true
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://moyesyside.ala.org.au:8086"
+        grails.serverURL = "http://moyesyside.ala.org.au:8080"
         fielddata.mediaUrl = "http://moyesyside.ala.org.au/fielddata/"
         fielddata.mediaDir = "/data/fielddata/"
         enableJMS = true //change to allow broadcast to queue
@@ -95,29 +95,32 @@ environments {
 log4j = {
 
     appenders {
-        //console name: "stdout", layout: pattern(conversionPattern: "%d [%c{1}]  %m%n"), threshold: org.apache.log4j.Level.DEBUG
-        rollingFile name: "fielddataDebug",
-                maxFileSize: 104857600,
-                file: "/var/log/tomcat6/fielddata-debug.log",
-                threshold: org.apache.log4j.Level.DEBUG,
-                layout: pattern(conversionPattern: "%d [%c{1}]  %m%n")
+        environments{
+            development {
+                console name: "stdout", layout: pattern(conversionPattern: "%d [%c{1}]  %m%n"), threshold: org.apache.log4j.Level.DEBUG
+            }
+            production {
+                rollingFile name: "fielddataLog",
+                        maxFileSize: 104857600,
+                        file: "/var/log/tomcat6/fielddata.log",
+                        threshold: org.apache.log4j.Level.DEBUG,
+                        layout: pattern(conversionPattern: "%d [%c{1}]  %m%n")
+                rollingFile name: "stacktrace", maxFileSize: 1024, file: "/var/log/tomcat6/fielddata-stacktrace.log"
+            }
+        }
     }
-    appenders {
-        rollingFile name: "stacktrace", maxFileSize: 1024, file: "/var/log/tomcat6/fielddata-stacktrace.log"
-    }
-
 
     root {
-        debug  'fielddataDebug'
+        debug  'fielddataLog'
     }
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-	       'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-	       'org.codehaus.groovy.grails.web.mapping', // URL mapping
-	       'org.codehaus.groovy.grails.commons', // core / classloading
-	       'org.codehaus.groovy.grails.plugins', // plugins
+	         'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+	         'org.codehaus.groovy.grails.web.mapping', // URL mapping
+	         'org.codehaus.groovy.grails.commons', // core / classloading
+	         'org.codehaus.groovy.grails.plugins', // plugins
            'org.springframework.jdbc',
            'org.springframework.transaction',
            'org.codehaus.groovy',
