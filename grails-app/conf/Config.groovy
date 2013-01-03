@@ -20,6 +20,8 @@ bie.searchPath = "/search"
 brokerURL = 'tcp://localhost:61616'
 enableJMS = false
 userDetailsUrl = "http://auth.ala.org.au/userdetails/userDetails/getUserListFull"
+userDetailsSingleUrl = "https://auth.ala.org.au/userdetails/userDetails/getUserDetails"
+
 
 grails.project.groupId = "au.org.ala.fielddata" // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
@@ -72,7 +74,7 @@ grails.hibernate.cache.queries = true
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://moyesyside.ala.org.au:8080"
+        grails.serverURL = "http://moyesyside.ala.org.au:8086"
         fielddata.mediaUrl = "http://moyesyside.ala.org.au/fielddata/"
         fielddata.mediaDir = "/data/fielddata/"
         enableJMS = true //change to allow broadcast to queue

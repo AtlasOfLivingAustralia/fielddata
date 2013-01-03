@@ -88,21 +88,15 @@ class MobileController {
                     [success:true, recordId:record.id.toString()]
                 } else {
                     log.error("Unable to create record. " + recordParams.error)
-                    response.setContentType("application/json")
                     response.sendError(400, recordParams.error)
-                    [success:false]
                 }
             } catch (Exception e){
                 log.error(e.getMessage(),e)
-                response.setStatus(500)
-                response.setContentType("application/json")
-                [success:false]
+                response.sendError(500, e.getMessage())
             }
         } else {
             log.info("AUTHENTICATION FAILED: Mobile userName:" + params.userName + ", authKey:" +params.authenticationKey)
-            response.setStatus(403)
-            response.setContentType("application/json")
-            [success:false]
+            response.sendError(403, "Authentication failed")
         }
     }
 
@@ -149,6 +143,11 @@ class MobileController {
         //get the user Id....
         log.debug("Retrieving...user ID with user name: " + params.userName)
         def userId = userService.getUserEmailToIdMap().get(params.userName.toLowerCase())
+        if(!userId){
+            //need to do a synchronous lookup to auth
+            userId = userService.syncUserIdLookup(params.userName.toLowerCase())
+        }
+
         log.debug("Retrieved user ID: " + userId+ ", for user name: " + params.userName)
 
         //save the files
