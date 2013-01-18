@@ -27,7 +27,7 @@ class MobileController {
     def submitRecordMultipart(){
         log.debug("Mobile - submitRecordMultipart POST received...userName:" + params.userName + ", authKey:" + params.authenticationKey)
         def authenticated = checkAuthenticationKey(params.userName, params.authenticationKey)
-        log.debug("Mobile userName:" + params.userName + ", authKey:" +params.authenticationKey +", authenticated: " + authenticated)
+        log.debug("Mobile userName:" + params.userName + ", authKey:" + params.authenticationKey +", authenticated: " + authenticated)
         if (authenticated){
             try {
                 log.debug("Mobile parsing parameters...")
@@ -123,7 +123,6 @@ class MobileController {
         def accuracyInMeters = params.accuracyInMeters
         def coordinatePrecision = params.coordinatePrecision
         def imageLicence = params.imageLicence
-
         log.debug("Multipart record request submission received.");
 
         // Convert date to desired format
@@ -141,39 +140,45 @@ class MobileController {
         }
 
         //get the user Id....
-        log.debug("Retrieving...user ID with user name: " + params.userName)
+        log.info("Retrieving...user ID with user name: " + params.userName)
         def userId = userService.getUserEmailToIdMap().get(params.userName.toLowerCase())
         if(!userId){
             //need to do a synchronous lookup to auth
+            log.info("Retrieving user ID with synchronous auth lookup user name: " + params.userName)
             userId = userService.syncUserIdLookup(params.userName.toLowerCase())
+            log.info("Retrieved user ID with synchronous auth lookup: " + userId)
         }
 
-        log.debug("Retrieved user ID: " + userId+ ", for user name: " + params.userName)
-
-        //save the files
-        def recordParams = [
-               userId:userId,
-               eventDate:dateToUse,
-               eventTime:time,
-               taxonConceptID:taxonId,
-               scientificName:taxonName,
-               family:params.family,
-               kingdom:params.kingdom,
-               decimalLongitude:params.longitude,
-               decimalLatitude:params.latitude,
-               individualCount:number,
-               coordinateUncertaintyInMeters:accuracyInMeters,
-               coordinatePrecision:coordinatePrecision,
-               imageLicence:imageLicence,
-               commonName:params.commonName,
-               locality:params.locationName,
-               device:params.deviceName,
-               devicePlatform:params.devicePlatform,
-               deviceId: params.deviceId,
-               occurrenceRemarks:params.notes
-        ]
-
-        log.debug((recordParams as JSON).toString(true))
-        [error:null, record: recordParams]
+        if(userId){
+            log.debug("Retrieved user ID: " + userId+ ", for user name: " + params.userName)
+            //save the files
+            def recordParams = [
+                   userId:userId,
+                   eventDate:dateToUse,
+                   eventTime:time,
+                   taxonConceptID:taxonId,
+                   scientificName:taxonName,
+                   family:params.family,
+                   kingdom:params.kingdom,
+                   decimalLongitude:params.longitude,
+                   decimalLatitude:params.latitude,
+                   individualCount:number,
+                   coordinateUncertaintyInMeters:accuracyInMeters,
+                   coordinatePrecision:coordinatePrecision,
+                   imageLicence:imageLicence,
+                   commonName:params.commonName,
+                   locality:params.locationName,
+                   device:params.deviceName,
+                   devicePlatform:params.devicePlatform,
+                   deviceId: params.deviceId,
+                   occurrenceRemarks:params.notes,
+                   submissionMethod:"mobile"
+            ]
+            log.debug((recordParams as JSON).toString(true))
+            [error:null, record: recordParams]
+        } else {
+            log.error("Unable to retrieve a userId for username: " + params.userName)
+            [error:"Authentication has failed for username: " + params.userName, record: null]
+        }
     }
 }

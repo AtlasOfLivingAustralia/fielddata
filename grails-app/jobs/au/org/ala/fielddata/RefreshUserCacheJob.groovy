@@ -11,8 +11,8 @@ class RefreshUserCacheJob {
   def userService
 
   def execute() {
-      log.info("****** Refreshing user details ****** " + new Date())
+      log.debug("****** Refreshing user details ****** " + new Date())
       userService.refreshUserDetails()
-      log.info("****** Completed refreshing user details ******" + new Date())
+      log.debug("****** Completed refreshing user details ******" + new Date())
   }
 }
