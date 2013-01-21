@@ -83,7 +83,7 @@ class MediaService {
                 def imagePath = mapOfProperties["associatedMedia"].replaceAll(grailsApplication.config.fielddata.mediaDir,
                         grailsApplication.config.fielddata.mediaUrl)
                 mapOfProperties['associatedMedia'] = [imagePath]
-                mapOfProperties['images'] = [image]
+                //mapOfProperties['images'] = [image]
             }
         }
     }
