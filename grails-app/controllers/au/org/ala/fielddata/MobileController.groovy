@@ -101,15 +101,19 @@ class MobileController {
     }
 
     private def boolean checkAuthenticationKey(String userName, String authKey) throws Exception {
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpPost post = new HttpPost("https://m.ala.org.au/mobileauth/mobileKey/checkKey");
-        def nameValuePairs = new ArrayList<NameValuePair>();
-        nameValuePairs.add(new BasicNameValuePair("userName", userName))
-        nameValuePairs.add(new BasicNameValuePair("authKey", authKey))
-        post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-        HttpResponse httpResponse = httpClient.execute(post)
-        log.debug("Authentication check:" + httpResponse.getStatusLine().getStatusCode() + ", for username: " + userName + ", and auth key " + authKey)
-        httpResponse.getStatusLine().getStatusCode() == 200
+//        HttpClient httpClient = new DefaultHttpClient();
+//        HttpPost post = new HttpPost("https://m.ala.org.au/mobileauth/mobileKey/checkKey");
+//        def nameValuePairs = new ArrayList<NameValuePair>();
+//        nameValuePairs.add(new BasicNameValuePair("userName", userName))
+//        nameValuePairs.add(new BasicNameValuePair("authKey", authKey))
+//        post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+//        HttpResponse httpResponse = httpClient.execute(post)
+//        log.debug("Authentication check:" + httpResponse.getStatusLine().getStatusCode() + ", for username: " + userName + ", and auth key " + authKey)
+//        httpResponse.getStatusLine().getStatusCode() == 200
+
+        //do we recognise the userName ?
+
+        userService.syncUserIdLookup(userName.toLowerCase()) != null
     }
 
     private def constructRecordParams(params){
