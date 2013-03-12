@@ -190,7 +190,11 @@ class RecordController {
         recordService.updateRecord(r,json)
         setResponseHeadersForRecord(response, r)
         response.setContentType("application/json")
-        broadcastService.sendUpdate(r)
+        try {
+            broadcastService.sendUpdate(r)
+        } catch (Exception e){
+            log.error(e.getMessage(), e)
+        }
         [id:r.id.toString()]
     }
 
