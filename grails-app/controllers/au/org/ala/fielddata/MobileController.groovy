@@ -112,8 +112,12 @@ class MobileController {
 //        httpResponse.getStatusLine().getStatusCode() == 200
 
         //do we recognise the userName ?
-
-        userService.syncUserIdLookup(userName.toLowerCase()) != null
+        if(userName){
+            userService.syncUserIdLookup(userName.toLowerCase()) != null
+        } else {
+            log.info("Supplied username is blank")
+            false
+        }
     }
 
     private def constructRecordParams(params){
