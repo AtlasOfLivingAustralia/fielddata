@@ -79,7 +79,7 @@ environments {
         fielddata.mediaDir = "/data/fielddata/"
         enableJMS = true //change to allow broadcast to queue
         brokerURL = 'tcp://localhost:61616'
-        queueName = "org.ala.jms.cs"
+        queueName = "au.org.ala.cs"
     }
     production {
         grails.logging.jul.usebridge = false
