@@ -89,7 +89,7 @@ environments {
         fielddata.mediaDir = "/data/fielddata/media/"
         enableJMS = true //change to allow broadcast to queue
         brokerURL = 'tcp://ala-biocache1.vm.csiro.au:61616'
-        queueName = "org.ala.jms.cs"
+        queueName = "au.org.ala.cs"
     }
 }
 
