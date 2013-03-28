@@ -154,10 +154,17 @@ class RecordController {
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parse(request.getReader())
         if (json.userId){
-            def record = recordService.createRecord(json)
-            setResponseHeadersForRecord(response, record)
-            response.setContentType("application/json")
-            [id:record.id.toString()]
+            def (record,errors) = recordService.createRecord(json)
+            if(errors.size() == 0){
+                setResponseHeadersForRecord(response, record)
+                response.setContentType("application/json")
+                [id:record.id.toString()]
+            }
+            else{
+                record.delete(flush: true)
+                response.addHeader 'errors', (errors as grails.converters.JSON).toString()
+                response.sendError(400,"Unable to create a new record. See errors for more details." )
+            }
         } else {
             response.sendError(400, 'Missing userId')
         }
@@ -187,8 +194,10 @@ class RecordController {
         //json.eventDate = new Date().parse("yyyy-MM-dd", json.eventDate)
         //TODO add some data validation....
         Record r = Record.get(params.id)
-        recordService.updateRecord(r,json)
+        def errors=recordService.updateRecord(r,json)
         setResponseHeadersForRecord(response, r)
+        //add the errors to the header too
+        response.addHeader('errors', (errors as grails.converters.JSON).toString())
         response.setContentType("application/json")
         try {
             broadcastService.sendUpdate(r)

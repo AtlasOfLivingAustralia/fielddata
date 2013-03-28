@@ -2,6 +2,7 @@ package au.org.ala.fielddata
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import org.apache.commons.lang.StringEscapeUtils
 
 class MediaService {
 
@@ -138,7 +139,9 @@ class MediaService {
         def destFile = new File(grailsApplication.config.fielddata.mediaDir + recordId + File.separator + idx + "_" +address.tokenize("/")[-1])
         def out = new BufferedOutputStream(new FileOutputStream(destFile))
         log.debug("Trying to download..." + address)
-        out << new URL(address).openStream()
+        String decodedAddress = StringEscapeUtils.unescapeXml(address);
+        log.debug("Decoded address " + decodedAddress)
+        out << new URL(decodedAddress).openStream()
         out.close()
         generateAllSizes(destFile)
         destFile
