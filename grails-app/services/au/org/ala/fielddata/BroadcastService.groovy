@@ -17,6 +17,8 @@ class BroadcastService {
 
     def mediaService
 
+    def failedRecordService
+
     JmsTemplate jmsTemplate
 
     def userService
@@ -48,35 +50,82 @@ class BroadcastService {
         synced
     }
 
+    def resubmit(method,recordid){
+        Record r = Record.get(recordid)
+        log.debug("Resubmitting : " + r.properties)
+        boolean ok = false
+        switch(method){
+            case "DELETE":
+                ok= sendDelete(recordid)
+                break
+            case "UPDATE":
+                ok= sendUpdate(r)
+                break
+            case "CREATE" :
+                ok = sendCreate(r)
+                break
+        }
+        if(ok)
+            failedRecordService.removeFailed(r)
+    }
+
     def sendCreate(record){
         if(grailsApplication.config.enableJMS){
-            def mapOfProperties = toMap(record)
-            def json = mapOfProperties as JSON
-            log.info("sending create: " + record["id"])
-            sendMessage("CREATE", json.toString(true))
+            try{
+                def mapOfProperties = toMap(record)
+                def json = mapOfProperties as JSON
+                log.info("sending create: " + record["id"])
+                sendMessage("CREATE", json.toString(true))
+                true
+            }
+            catch(Exception e){
+                failedRecordService.markAsFailed("CREATE" ,record)
+                log.error(e.getMessage(), e)
+                false
+            }
         } else {
             log.info "JMS currently disabled....not sending CREATE"
+            true
         }
     }
 
     def sendUpdate(record){
         if(grailsApplication.config.enableJMS){
-            def mapOfProperties = toMap(record)
-            def json = mapOfProperties as JSON
-            log.info("sending update: " + record["id"])
-            sendMessage("UPDATE", json.toString(true))
+            try{
+                log.debug("Record to update " + record.properties)
+                def mapOfProperties = toMap(record)
+                def json = mapOfProperties as JSON
+                log.info("sending update: " + record["id"])
+                sendMessage("UPDATE", json.toString(true))
+                return true
+            }
+            catch(Exception e){
+                failedRecordService.markAsFailed("UPDATE", record)
+                log.error(e.getMessage(), e)
+                return false
+            }
         } else {
             log.info "JMS currently disabled....not sending UPDATE"
+            return true
         }
     }
 
     def sendDelete(occurrenceID){
         if(grailsApplication.config.enableJMS){
-            def map = [occurrenceID:occurrenceID]
-            log.debug("sending delete: " + occurrenceID)
-            sendMessage("DELETE", (map as JSON).toString(true))
+            try{
+                def map = [occurrenceID:occurrenceID]
+                log.debug("sending delete: " + occurrenceID)
+                sendMessage("DELETE", (map as JSON).toString(true))
+                true
+            }
+            catch(Exception e){
+                failedRecordService.markAsFailed("DELETE", Record.get(occurrenceID))
+                log.error(e.getMessage(), e)
+                false
+            }
         } else {
             log.info "JMS currently disabled....not sending DELETE"
+            true
         }
     }
 
