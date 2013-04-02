@@ -49,24 +49,43 @@ class BroadcastService {
         }
         synced
     }
-
-    def resubmit(method,recordid){
-        Record r = Record.get(recordid)
-        log.debug("Resubmitting : " + r.properties)
-        boolean ok = false
-        switch(method){
-            case "DELETE":
-                ok= sendDelete(recordid)
-                break
-            case "UPDATE":
-                ok= sendUpdate(r)
-                break
-            case "CREATE" :
-                ok = sendCreate(r)
-                break
+    /**
+     * Resubmits all the records that failed to be added to the JMS queue
+     * @return number of records that we considered for resubmission
+     */
+    def resubmitFailedRecords(){
+        //Record r = Record.get(recordid)
+        //log.debug("Resubmitting : " + r.properties)
+        log.debug("Resubmit all failed records")
+        def max = 100
+        def offset = 0
+        def count = 0
+        def finished = false
+        while(!finished){
+            def results = FailedRecord.list([offset:offset,max:max])
+            finished = results.isEmpty()
+            results.each {
+                log.debug("Trying to resend " + it.record + " type " + it.updateType+ " props " + it.properties)
+                boolean ok = false
+                switch(it.updateType){
+                    case "DELETE":
+                        ok= sendDelete(it.record.id.toStringMongod())
+                        break
+                    case "UPDATE":
+                        ok= sendUpdate(it.record)
+                        break
+                    case "CREATE" :
+                        ok = sendCreate(it.record)
+                        break
+                }
+                if(ok)
+                    failedRecordService.removeFailed(it.record)
+                //broadcastService.resubmit(it.updateType, it.record.id)
+                count++
+            }
+            offset += results.size()
         }
-        if(ok)
-            failedRecordService.removeFailed(r)
+        count
     }
 
     def sendCreate(record){

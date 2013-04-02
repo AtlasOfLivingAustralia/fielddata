@@ -13,10 +13,8 @@ class ResubmitRecordsToJMSJob {
     def execute() {
         log.info("Checking to see if there are any failed JMS tasks to resend")
 
-        FailedRecord.list().each {
-            log.debug("Trying to resend " + it.record + " type " + it.updateType+ " props " + it.properties)
+        def count = broadcastService.resubmitFailedRecords()
 
-            broadcastService.resubmit(it.updateType, it.record.id)
-        }
+        log.info("Finished checking " + count + " failed records")
     }
 }
