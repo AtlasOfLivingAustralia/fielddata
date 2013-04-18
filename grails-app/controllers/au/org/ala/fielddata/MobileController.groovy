@@ -33,22 +33,31 @@ class MobileController {
                 log.debug("Mobile parsing parameters...")
                 def recordParams = constructRecordParams(params)
                 if (recordParams.record){
-                    Record record = recordService.createRecord(recordParams.record)
-                    log.debug("Mobile - record created: " + record?.id?.toString())
-                    //handle the multipart message.....
-                    if(request instanceof MultipartHttpServletRequest){
-                        Map<String, MultipartFile> fileMap = request.getFileMap()
-                        if (fileMap.containsKey("attribute_file_1")) {
-                            MultipartFile multipartFile = fileMap.get("attribute_file_1")
-                            byte[] imageAsBytes = multipartFile.getBytes()
-                            String originalName = multipartFile.getOriginalFilename()
-                            recordService.addImageToRecord(record, originalName, imageAsBytes)
+                    def (record,errors) = recordService.createRecord(recordParams.record)
+                    if(errors.size() == 0){
+                        log.debug("Mobile - record created: " + record?.id?.toString())
+                        //handle the multipart message.....
+                        if(request instanceof MultipartHttpServletRequest){
+                            Map<String, MultipartFile> fileMap = request.getFileMap()
+                            if (fileMap.containsKey("attribute_file_1")) {
+                                MultipartFile multipartFile = fileMap.get("attribute_file_1")
+                                byte[] imageAsBytes = multipartFile.getBytes()
+                                String originalName = multipartFile.getOriginalFilename()
+                                recordService.addImageToRecord(record, originalName, imageAsBytes)
+                            }
                         }
+                        log.debug "Added record: " + record.id.toString()
+                        response.setStatus(200)
+                        response.setContentType("application/json")
+                        [success:true, recordId:record.id.toString()]
                     }
-                    log.debug "Added record: " + record.id.toString()
-                    response.setStatus(200)
-                    response.setContentType("application/json")
-                    [success:true, recordId:record.id.toString()]
+                    else{
+                        record.delete(flush: true)
+                        response.setContentType("application/json")
+                        log.error("Unable to create record. " + errors)
+                        response.sendError(400, errors)
+                        [success:false]
+                    }
                 } else {
                     response.setContentType("application/json")
                     response.sendError(400, recordParams.error)
@@ -75,17 +84,25 @@ class MobileController {
                 log.debug("Mobile parsing parameters...")
                 def recordParams = constructRecordParams(params)
                 if (recordParams.record){
-                    Record record = recordService.createRecord(recordParams.record)
-                    log.debug("Mobile - record created: " + record?.id?.toString())
-                    //handle the base64 encoded image if supplied.....
-                    if(params.imageBase64 && params.imageFileName){
-                        byte[] imageAsBytes = Base64.decodeBase64(params.imageBase64)
-                        recordService.addImageToRecord(record, params.imageFileName, imageAsBytes)
+
+                    def (record,errors) = recordService.createRecord(recordParams.record)
+                    if(errors.size() == 0){
+                        log.debug("Mobile - record created: " + record?.id?.toString())
+                        //handle the base64 encoded image if supplied.....
+                        if(params.imageBase64 && params.imageFileName){
+                            byte[] imageAsBytes = Base64.decodeBase64(params.imageBase64)
+                            recordService.addImageToRecord(record, params.imageFileName, imageAsBytes)
+                        }
+                        log.debug "submitRecord POST - added record: " + record.id.toString()
+                        response.setStatus(200)
+                        response.setContentType("application/json")
+                        [success:true, recordId:record.id.toString()]
                     }
-                    log.debug "submitRecord POST - added record: " + record.id.toString()
-                    response.setStatus(200)
-                    response.setContentType("application/json")
-                    [success:true, recordId:record.id.toString()]
+                    else{
+                        record.delete(flush: true)
+                        log.error("Unable to create record. " + errors)
+                        response.sendError(400, errors)
+                    }
                 } else {
                     log.error("Unable to create record. " + recordParams.error)
                     response.sendError(400, recordParams.error)
