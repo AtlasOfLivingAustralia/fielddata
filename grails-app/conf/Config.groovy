@@ -1,14 +1,23 @@
-// locations to search for config files that get merged into the main config
-// config files can either be Java properties files or ConfigSlurper scripts
+def appName = 'fielddata'
+def ENV_NAME = "${appName.toUpperCase()}_CONFIG"
+default_config = "/data/${appName}/config/${appName}-config.properties"
+if(!grails.config.locations || !(grails.config.locations instanceof List)) {
+    grails.config.locations = []
+}
+if(System.getenv(ENV_NAME) && new File(System.getenv(ENV_NAME)).exists()) {
+    println "[${appName}] Including configuration file specified in environment: " + System.getenv(ENV_NAME);
+    grails.config.locations.add "file:" + System.getenv(ENV_NAME)
+} else if(System.getProperty(ENV_NAME) && new File(System.getProperty(ENV_NAME)).exists()) {
+    println "[${appName}] Including configuration file specified on command line: " + System.getProperty(ENV_NAME);
+    grails.config.locations.add "file:" + System.getProperty(ENV_NAME)
+} else if(new File(default_config).exists()) {
+    println "[${appName}] Including default configuration file: " + default_config;
+    grails.config.locations.add "file:" + default_config
+} else {
+    println "[${appName}] No external configuration file defined."
+}
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
-
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
+println "[${appName}] (*) grails.config.locations = ${grails.config.locations}"
 
 headerAndFooter.baseURL = "http://www2.ala.org.au/commonui"
 security.cas.urlPattern = ""
@@ -84,11 +93,10 @@ environments {
     production {
         grails.logging.jul.usebridge = false
         grails.serverURL = "http://fielddata.ala.org.au"
-        grails.serverURL = "http://fielddata.ala.org.au"
         fielddata.mediaUrl = "http://fielddata.ala.org.au/media/"
         fielddata.mediaDir = "/data/fielddata/media/"
         enableJMS = true //change to allow broadcast to queue
-        brokerURL = 'tcp://ala-biocache1.vm.csiro.au:61616'
+        brokerURL = 'tcp://ala-starr.it.csiro.au:61616'
         queueName = "au.org.ala.cs"
     }
 }
@@ -119,10 +127,10 @@ log4j = {
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-	         'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-	         'org.codehaus.groovy.grails.web.mapping', // URL mapping
-	         'org.codehaus.groovy.grails.commons', // core / classloading
-	         'org.codehaus.groovy.grails.plugins', // plugins
+	       'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+	       'org.codehaus.groovy.grails.web.mapping', // URL mapping
+	       'org.codehaus.groovy.grails.commons', // core / classloading
+	       'org.codehaus.groovy.grails.plugins', // plugins
            'org.springframework.jdbc',
            'org.springframework.transaction',
            'org.codehaus.groovy',
@@ -133,4 +141,3 @@ log4j = {
 
     debug  'au.org.ala'
 }
-
