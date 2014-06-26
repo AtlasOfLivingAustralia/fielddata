@@ -7,6 +7,7 @@ class UrlMappings {
         "/submit/recordMultiPart"(controller: "mobile"){ action = [POST:"submitRecordMultipart"] }
         "/mobile/submitRecord"(controller: "mobile"){ action = [POST:"submitRecord"] }
         "/mobile/submitRecordMultipart"(controller: "mobile"){ action = [POST:"submitRecordMultipart"] }
+        "/record/csv"(controller: "record"){ action = [GET:"csv"] }
         "/record/"(controller: "record"){ action = [GET:"list", POST:"create"] }
         "/record"(controller: "record"){ action = [GET:"list", POST:"create"] }
         "/record/"(controller: "record"){ action = [GET:"list", POST:"create"] }

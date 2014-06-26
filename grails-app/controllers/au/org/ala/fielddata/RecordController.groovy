@@ -1,5 +1,6 @@
 package au.org.ala.fielddata
 
+import au.com.bytecode.opencsv.CSVWriter
 import groovy.json.JsonSlurper
 import org.bson.types.ObjectId
 
@@ -14,6 +15,72 @@ class RecordController {
     def recordService
 
     def ignores = ["action","controller","associatedMedia"]
+
+    def csv(){
+        response.setContentType("text/csv")
+        def csvWriter = new CSVWriter(new OutputStreamWriter(response.outputStream))
+        csvWriter.writeNext(
+            [
+              "modified",
+              "decimalLatitude",
+              "decimalLongitude",
+              "eventDate",
+              "eventTime",
+              "userId",
+              "recordedBy",
+              "usingReverseGeocodedLocality",
+              "scientificName",
+              "family",
+              "kingdom",
+              "individualCount",
+              "submissionMethod",
+              "georeferenceProtocol",
+              "identificationVerificationStatus",
+              "occurrenceRemarks",
+              "coordinateUncertaintyInMeters",
+              "geodeticDatum",
+              "imageLicence",
+              "locality",
+              "associatedMedia",
+              "occurrenceID"
+            ] as String[]
+        )
+
+        Record.list().each {
+
+          def map = recordService.toMap(it)
+
+          csvWriter.writeNext(
+            [
+             it.lastUpdated ? it.lastUpdated.format("dd-MM-yyyy")  : "",
+             map.decimalLatitude?:"",
+             map.decimalLongitude?:"",
+             map.eventDate?:"",
+             map.eventTime?:"",
+             map.userId?:"",
+             map.recordedBy?:"",
+             map.usingReverseGeocodedLocality?:"",
+             map.scientificName?:"",
+             map.family?:"",
+             map.kingdom?:"",
+             map.individualCount?:"",
+             map.submissionMethod?:"",
+             map.georeferenceProtocol?:"",
+             map.identificationVerificationStatus?:"",
+             map.occurrenceRemarks?:"",
+             map.coordinateUncertaintyInMeters?:"",
+             map.geodeticDatum?:"",
+             map.imageLicence?:"",
+             map.locality?:"",
+             map.associatedMedia ? map.associatedMedia.join(";") : "",
+             map.occurrenceID?:"",
+            ] as String[]
+          )
+        }
+        csvWriter.flush()
+        csvWriter.close()
+    }
+
     /**
      * JSON body looks like:
      * {
