@@ -16,21 +16,10 @@ grails.project.dependency.resolution = {
     checksums true // Whether to verify checksums on resolve
 
     repositories {
-        inherits true // Whether to inherit repository definitions from plugins
-        mavenRepo "http://maven.ala.org.au/repository/"
-        grailsPlugins()
-        grailsHome()
-        grailsCentral()
-        mavenCentral()
-
-        // uncomment these to enable remote dependency resolution from public Maven repositories
-        //mavenCentral()
-        //mavenLocal()
-        //mavenRepo "http://snapshots.repository.codehaus.org"
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-
+        mavenLocal()
+        mavenRepo("http://nexus.ala.org.au/content/groups/public/")
     }
+
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         runtime 'org.imgscalr:imgscalr-lib:4.2'
