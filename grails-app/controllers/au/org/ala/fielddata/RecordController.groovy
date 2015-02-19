@@ -68,7 +68,7 @@ class RecordController {
              map.scientificName?:"",
              map.family?:"",
              map.kingdom?:"",
-             map.taxonConceptID?:""
+             map.taxonConceptID?:"",
              map.individualCount?:"",
              map.submissionMethod?:"",
              map.georeferenceProtocol?:"",
