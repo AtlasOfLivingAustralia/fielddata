@@ -22,6 +22,7 @@ class RecordController {
         csvWriter.writeNext(
             [
               "modified",
+              "dateCreated",
               "decimalLatitude",
               "decimalLongitude",
               "eventDate",
@@ -29,9 +30,11 @@ class RecordController {
               "userId",
               "recordedBy",
               "usingReverseGeocodedLocality",
+              "commonName",
               "scientificName",
               "family",
               "kingdom",
+              "taxonConceptID",
               "individualCount",
               "submissionMethod",
               "georeferenceProtocol",
@@ -53,6 +56,7 @@ class RecordController {
           csvWriter.writeNext(
             [
              it.lastUpdated ? it.lastUpdated.format("dd-MM-yyyy")  : "",
+             it.dateCreated,
              map.decimalLatitude?:"",
              map.decimalLongitude?:"",
              map.eventDate?:"",
@@ -60,9 +64,11 @@ class RecordController {
              map.userId?:"",
              map.recordedBy?:"",
              map.usingReverseGeocodedLocality?:"",
+             map.commonName?:"",
              map.scientificName?:"",
              map.family?:"",
              map.kingdom?:"",
+             map.taxonConceptID?:""
              map.individualCount?:"",
              map.submissionMethod?:"",
              map.georeferenceProtocol?:"",
